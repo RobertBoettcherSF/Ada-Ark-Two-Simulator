@@ -14,6 +14,7 @@
   #stick{position:fixed;left:24px;bottom:24px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);display:none}
   #knob{position:absolute;left:40px;top:40px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.45)}
   #dbg{position:fixed;right:12px;top:12px;display:none;padding:8px 12px;font-size:14px;border:0;border-radius:6px;background:#444;color:#fff}
+  #upd{position:fixed;left:50%;top:12px;transform:translateX(-50%);display:none;padding:10px 16px;font-size:15px;border:0;border-radius:8px;background:#f6c64a;color:#111;font-weight:600;z-index:10}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -27,6 +28,7 @@
 <div id="start">Loading model…</div>
 <div id="stick"><div id="knob"></div></div>
 <button id="dbg">Debug</button>
+<button id="upd">New version available, tap to load</button>
 <div id="toast"></div>
 <script type="module">
 import * as THREE from 'three';
@@ -207,6 +209,34 @@ renderer.setAnimationLoop(()=>{
   renderer.render(scene,camera);
 });
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+</script>
+<script>
+// Update check: githack caches /main/ for a while, so compare against the latest commit
+// and offer a commit-pinned URL (always fresh, assets load relative to it).
+(function(){
+  const REPO='RobertBoettcherSF/Ada-Ark-Two-Simulator';
+  const seg=location.pathname.split('/');            // ['',owner,repo,ref,'web','index.html']
+  const ref=seg[3]||'main', pinned=/^[0-9a-f]{40}$/.test(ref);
+  const btn=document.getElementById('upd');
+  const pos=document.getElementById('pos');
+  async function check(){
+    try{
+      const r=await fetch('https://api.github.com/repos/'+REPO+'/commits/main',{headers:{Accept:'application/vnd.github.sha'},cache:'no-store'});
+      if(!r.ok) return;
+      const sha=(await r.text()).trim();
+      if(!/^[0-9a-f]{40}$/.test(sha)) return;
+      const have=pinned?ref:localStorage.getItem('arkSha');
+      if(sha!==have){
+        btn.style.display='block';
+        btn.onclick=()=>{localStorage.setItem('arkSha',sha);
+          location.href='https://raw.githack.com/'+REPO+'/'+sha+'/web/index.html'+location.search;};
+      }
+    }catch(e){}
+  }
+  if(location.hostname.endsWith('githack.com')){check();setInterval(check,120000);}
+  const v=document.createElement('div');v.style.cssText='position:fixed;right:8px;bottom:6px;font-size:11px;opacity:.5';
+  v.textContent='build '+(pinned?ref.slice(0,7):ref);document.body.appendChild(v);
+})();
 </script>
 </body>
 </html>
