@@ -39,7 +39,7 @@
 <body>
 <div id="hud"><b>Ark Two</b> · <span id="bname">walk-through</span><br>
 <span id="help">W A S D move · mouse look · Shift run · R scale refs · M map · F9 debug · Esc release</span><br>
-<span id="pos"></span></div>
+<span id="pos"></span><br><span id="fps"></span></div>
 <button id="gear" title="Einstellungen" aria-label="Einstellungen">⚙</button>
 <div id="settings">
   <h3>Einstellungen</h3>
@@ -49,6 +49,9 @@
   <label for="slBunker">Bunkerbeleuchtung</label>
   <input id="slBunker" type="range" min="0" max="2" step="0.05" value="1">
   <div class="vals" id="vBunker">1.00</div>
+  <label for="slRes">Auflösung</label>
+  <input id="slRes" type="range" min="0.5" max="1" step="0.05" value="1">
+  <div class="vals" id="vRes">100 %</div>
   <button class="close" id="setClose">Schließen</button>
 </div>
 <div id="minimapWrap" title="Tippen für große Karte">
@@ -68,6 +71,7 @@
 <script type="module">
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 
 const MODEL = '../assets/' + (new URLSearchParams(location.search).get('build') || 'ark_two_v007') + '.glb';
 const BUILD = MODEL.split('/').pop().replace('.glb','');
@@ -78,10 +82,12 @@ const touch = matchMedia('(pointer: coarse)').matches;
 const qs = new URLSearchParams(location.search);
 
 const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.setSize(innerWidth,innerHeight);
+let resScale = +localStorage.getItem('arkRes') || 1;
+resScale = Math.min(1, Math.max(0.5, resScale));
+const applyRes=()=>{ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)*resScale); renderer.setSize(innerWidth,innerHeight); };
+applyRes();
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
-renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = false; // performance: no shadow pass
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -92,8 +98,15 @@ const fog = SKY?.fog ?? {color:'#9db8cf',near_m:60,far_m:400};
 scene.background = C(sky.horizon);
 scene.fog = new THREE.Fog(C(fog.color), fog.near_m, fog.far_m);
 const hemi=new THREE.HemisphereLight(C(sky.upper), C(SKY?.ground?.grass_shade ?? '#4c6328'), 0.6); scene.add(hemi);
-let sun=null; const lamps=[];
-let bunkerLights=[]; // Point/Spot used for Bunkerbeleuchtung
+let sun=null;
+// performance: glb point/spot lights are removed and replaced by a fixed pool of POOL lights
+// (constant light count = no shader recompiles), assigned to the lamps nearest the camera.
+const lampData=[]; // {name,pos,color,intensity,distance,decay,bunker}
+const POOL=8, pool=[];
+for(let i=0;i<POOL;i++){ const L=new THREE.PointLight(0xffffff,0,0,2); L.name='PoolLight_'+i; pool.push(L); scene.add(L); }
+const stripMats=new Set(); // Mat_Bunker_Strip materials, emissive scaled by Bunkerbeleuchtung
+const chunks=[]; // merged static meshes, culled by distance inside
+const OUTFOG={color:C(fog.color), near:fog.near_m, far:fog.far_m}, INFOG={color:C('#1c1e21'), near:20, far:40}, CULL_M=35;
 // gradient sky dome with soft procedural clouds, colours from data/sky.json
 scene.add(new THREE.Mesh(new THREE.SphereGeometry(450,32,16), new THREE.ShaderMaterial({
   side:THREE.BackSide, depthWrite:false, fog:false,
@@ -190,15 +203,72 @@ async function tryPlanJson(){
     return out.length?out:null;
   }catch(e){ return null; }
 }
-function pickBunkerLights(){
-  const named=lamps.filter(o=>/^Light_Bunker_/.test(o.name));
-  if(named.length) return named;
-  return lamps.filter(o=>o.isPointLight||o.isSpotLight);
+function markBunkerLamps(){
+  const named=lampData.some(l=>/^Light_Bunker_/.test(l.name));
+  for(const l of lampData) l.bunker = named ? /^Light_Bunker_/.test(l.name) : true;
+}
+const _cp=new THREE.Vector3();
+function updatePool(){
+  const c=camera.position, fy=feet+1.2;
+  const sc=lampData.map(l=>{ const dy=Math.abs(l.pos.y-fy); return [l.pos.distanceToSquared(c)+(dy<4?0:1e6), l]; });
+  sc.sort((a,b)=>a[0]-b[0]);
+  for(let i=0;i<POOL;i++){
+    const L=pool[i], e=sc[i];
+    if(!e){ L.intensity=0; continue; }
+    const l=e[1];
+    L.position.copy(l.pos); L.color.copy(l.color); L.distance=l.distance; L.decay=l.decay;
+    L.intensity=l.intensity*(l.bunker?bunkerBright:1);
+  }
 }
 function applyBunkerLights(){
-  for(const L of bunkerLights){
-    const base=L.userData.base ?? L.intensity;
-    L.intensity = base * bunkerBright;
+  updatePool();
+  for(const m of stripMats) m.emissiveIntensity=m.userData.baseEmissive*bunkerBright;
+}
+// objects hidden for gameplay (Zone_Interior, scale refs off) must not block rays; merged originals are hidden only for drawing
+function rayable(o){
+  if(o.userData.chunk) return false;
+  for(let a=o;a;a=a.parent){ if(!a.visible && !a.userData.merged) return false; }
+  return true;
+}
+// --- load-time merge: static meshes per material + attribute signature + 20 m cell
+function mergeStatic(root){
+  root.updateMatrixWorld(true);
+  const groups=new Map(), box=new THREE.Box3(), ctr=new THREE.Vector3();
+  root.traverse(o=>{
+    if(!o.isMesh || o.isSkinnedMesh || o.isInstancedMesh || Array.isArray(o.material) || !o.geometry?.attributes?.position) return;
+    if(Object.keys(o.geometry.morphAttributes||{}).length) return;
+    for(let a=o;a;a=a.parent){ if(!a.visible || /^(Sign_|ScaleRef_|Zone_Interior)/.test(a.name)) return; }
+    const attrs=Object.keys(o.geometry.attributes).sort().join(',')+(o.geometry.index?'|i':'|n');
+    box.setFromObject(o).getCenter(ctr);
+    const key=o.material.uuid+'|'+attrs+'|'+Math.floor(ctr.x/20)+','+Math.floor(ctr.y/20)+','+Math.floor(ctr.z/20);
+    if(!groups.has(key)) groups.set(key,[]); groups.get(key).push(o);
+  });
+  for(const [key,list] of groups){
+    const geos=list.map(o=>{
+      const g=o.geometry.clone(); g.applyMatrix4(o.matrixWorld);
+      if(o.matrixWorld.determinant()<0 && g.index){ const ix=g.index.array; for(let i=0;i<ix.length;i+=3){ const t=ix[i+1]; ix[i+1]=ix[i+2]; ix[i+2]=t; } }
+      return g;
+    });
+    const merged=geos.length===1?geos[0]:mergeGeometries(geos,false);
+    if(!merged){ geos.forEach(g=>g.dispose()); continue; }
+    if(geos.length>1) geos.forEach(g=>g.dispose());
+    merged.computeBoundingSphere(); merged.computeBoundingBox();
+    const m=new THREE.Mesh(merged,list[0].material);
+    m.name='Merged_'+chunks.length; m.userData.chunk=true; m.matrixAutoUpdate=false; m.updateMatrix();
+    scene.add(m); chunks.push(m);
+    for(const o of list){ o.visible=false; o.userData.merged=true; }
+  }
+}
+// --- local collisions: only raycast meshes near the player
+const sphereOf=new Map(), nearColliders=[], nearWalkables=[], lastNear=new THREE.Vector3(1e9,0,0);
+function worldSphere(o){ let s=sphereOf.get(o); if(!s){ if(!o.geometry.boundingSphere) o.geometry.computeBoundingSphere(); s=o.geometry.boundingSphere.clone().applyMatrix4(o.matrixWorld); sphereOf.set(o,s); } return s; }
+function rebuildNear(force){
+  const p=new THREE.Vector3(camera.position.x,feet+1,camera.position.z);
+  if(!force && p.distanceTo(lastNear)<1) return;
+  lastNear.copy(p);
+  for(const [src,dst] of [[colliders,nearColliders],[walkables,nearWalkables]]){
+    dst.length=0;
+    for(const o of src){ const s=worldSphere(o); if(s.center.distanceTo(p)<s.radius+3) dst.push(o); }
   }
 }
 function findCurrentRoom(x,z,y){
@@ -214,6 +284,7 @@ function findCurrentRoom(x,z,y){
 
 const onModel = g=>{
   g.scene.updateMatrixWorld(true);
+  const glbLights=[];
   const zone=g.scene.getObjectByName('Zone_Interior');
   if(zone){ interiorBox=new THREE.Box3().setFromObject(zone); zone.visible=false; }
   const spawn=g.scene.getObjectByName('Spawn_Start');
@@ -221,23 +292,32 @@ const onModel = g=>{
     const q=new THREE.Quaternion(); spawn.getWorldQuaternion(q); yaw=new THREE.Euler().setFromQuaternion(q,'YXZ').y; }
   g.scene.traverse(o=>{
     if(o.name==='Zone_Interior' || o.parent?.name==='Zone_Interior') return;
-    if(o.isLight){ o.intensity = o.isDirectionalLight ? Math.min(o.intensity,3) : Math.min(o.intensity,8); if(o.isDirectionalLight){ sun=o; o.castShadow=true; o.shadow.mapSize.set(2048,2048); const sc=o.shadow.camera; sc.left=sc.bottom=-30; sc.right=sc.top=30; sc.near=0.5; sc.far=200; o.shadow.bias=-0.0005; o.shadow.normalBias=0.03; } else lamps.push(o); o.userData.base=o.intensity; }
+    if(o.isLight){ o.intensity = o.isDirectionalLight ? Math.min(o.intensity,3) : Math.min(o.intensity,8); o.userData.base=o.intensity;
+      if(o.isDirectionalLight){ sun=o; o.castShadow=false; }
+      else if(o.isPointLight||o.isSpotLight){ const pos=new THREE.Vector3(); o.getWorldPosition(pos);
+        lampData.push({name:o.name, pos, color:o.color.clone(), intensity:o.intensity, distance:o.distance, decay:o.decay, bunker:true}); glbLights.push(o); } }
     if(o.isMesh){
-      o.castShadow=true; o.receiveShadow=true;
+      o.castShadow=false; o.receiveShadow=false;
+      if(o.material?.name==='Mat_Bunker_Strip' && !stripMats.has(o.material)){ o.material.userData.baseEmissive=o.material.emissiveIntensity; stripMats.add(o.material); }
       if(WALKRE.test(o.name)) walkables.push(o);
       if(SKY?.ground && o.material?.name==='Grass_Mound') o.material.color.set(SKY.ground.grass_sunlit);
       if(o.name.startsWith('ScaleRef_')){ o.visible=false; scaleRefs.push(o); return; }
       if(!WALKRE.test(o.name) && !/Bulb|Sign_/.test(o.name)) colliders.push(o);
     }
   });
+  // drop glb point/spot lights (children re-attached to keep their world place)
+  for(const L of glbLights){ const par=L.parent; for(const ch of [...L.children]) par.attach(ch); par.remove(L); }
   scene.add(g.scene);
-  bunkerLights=pickBunkerLights();
+  mergeStatic(g.scene);
+  markBunkerLamps();
   applyBunkerLights();
+  if(qs.has('perf')) console.log('ARKPERF lamps '+lampData.length+' chunks '+chunks.length+' strips '+stripMats.size);
   if(qp){ // ?pos= has no height: stand on the lowest walkable floor under that point (interiors lie below the mound)
     g.scene.updateMatrixWorld(true);
     const rc=new THREE.Raycaster(new THREE.Vector3(camera.position.x,100,camera.position.z),new THREE.Vector3(0,-1,0));
     const hs=rc.intersectObjects(walkables,false), ind=hs.filter(h=>!OUTDOOR.test(h.object.name));
     if(ind.length) feet=ind[ind.length-1].point.y; else if(hs.length) feet=hs[0].point.y; }
+  rebuildNear(true); updatePool();
   // rooms: prefer plan.json, else derive from floors
   tryPlanJson().then(plan=>{
     rooms = plan || roomsFromModel(g.scene);
@@ -274,6 +354,8 @@ function syncSliders(){
   document.getElementById('slBunker').value=bunkerBright;
   document.getElementById('vBright').textContent=brightGeneral.toFixed(2);
   document.getElementById('vBunker').textContent=bunkerBright.toFixed(2);
+  document.getElementById('slRes').value=resScale;
+  document.getElementById('vRes').textContent=Math.round(resScale*100)+' %';
 }
 document.getElementById('gear').onclick=e=>{ e.stopPropagation(); openSettings(!settingsOpen); };
 document.getElementById('setClose').onclick=e=>{ e.stopPropagation(); openSettings(false); };
@@ -284,6 +366,10 @@ document.getElementById('slBright').oninput=e=>{
 document.getElementById('slBunker').oninput=e=>{
   bunkerBright=+e.target.value; localStorage.setItem('arkBunker', String(bunkerBright));
   applyBunkerLights(); document.getElementById('vBunker').textContent=bunkerBright.toFixed(2);
+};
+document.getElementById('slRes').oninput=e=>{
+  resScale=+e.target.value; localStorage.setItem('arkRes', String(resScale));
+  applyRes(); document.getElementById('vRes').textContent=Math.round(resScale*100)+' %';
 };
 document.getElementById('minimapWrap').onclick=e=>{ e.stopPropagation(); openBigMap(true); };
 document.getElementById('bigMap').onclick=()=>openBigMap(false);
@@ -344,7 +430,7 @@ const ray=new THREE.Raycaster();
 function blocked(from,dir,dist){
   for(const h of [0.5,1.2]){
     ray.set(new THREE.Vector3(from.x,feet+h,from.z),dir); ray.far=dist+RADIUS;
-    if(ray.intersectObjects(colliders,false).length) return true;
+    if(ray.intersectObjects(nearColliders,false).length) return true;
   }
   return false;
 }
@@ -369,12 +455,14 @@ function move(dt){
 function snapshot(){
   const p=camera.position;
   ray.setFromCamera(new THREE.Vector2(0,0),camera); ray.far=100;
-  const hit=ray.intersectObjects(scene.children,true).find(h=>h.object.visible);
+  const hit=ray.intersectObjects(scene.children,true).find(h=>rayable(h.object));
+  let yd=((yaw*57.2958)%360+360)%360; if(yd>180) yd-=360;
   const data={build:BUILD,commit:(location.pathname.split('/')[3]||'main'),time:new Date().toISOString(),ua:navigator.userAgent,
-    camera:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),yaw_deg:+(yaw*57.2958).toFixed(1),pitch_deg:+(pitch*57.2958).toFixed(1)},
+    camera:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),yaw_deg:+yd.toFixed(1),pitch_deg:+(pitch*57.2958).toFixed(1)},
     looking_at:hit?{object:hit.object.name,distance_m:+hit.distance.toFixed(2)}:null,
     room:currentRoomName||null,
-    brightness:{allgemein:brightGeneral, bunker:bunkerBright},
+    brightness:{allgemein:brightGeneral, bunker:bunkerBright}, resolution:resScale,
+    fps:fpsNow, drawCalls:lastCalls,
     note:prompt('Debug note (optional):')||''};
   const stamp=data.time.replace(/[:.]/g,'-');
   dl(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),`ark_debug_${stamp}.json`);
@@ -486,31 +574,50 @@ function drawBigMap(){
 
 // --- loop
 let inside=0, onOutdoor=true;
-const clock=new THREE.Clock(), posEl=document.getElementById('pos');
+const clock=new THREE.Clock(), posEl=document.getElementById('pos'), fpsEl=document.getElementById('fps');
+let fpsNow=0, lastCalls=0, fpsFrames=0, fpsT=performance.now(), tPool=0, tCull=0, tMini=0, mmX=1e9, mmZ=0, mmYaw=0, mmRoom=null;
+const down=new THREE.Vector3(0,-1,0), rayO=new THREE.Vector3();
 renderer.setAnimationLoop(()=>{
-  const dt=Math.min(clock.getDelta(),0.05);
+  const dt=Math.min(clock.getDelta(),0.05), now=performance.now();
   pitch=Math.max(-1.4,Math.min(1.4,pitch));
   camera.rotation.set(pitch,yaw,0);
+  rebuildNear(false);
   if(started && !uiBlocked()) move(dt);
   // follow floors and ramps: highest walkable surface under the feet, up to 0.45 m step-up
-  ray.set(new THREE.Vector3(camera.position.x,feet+0.45,camera.position.z),new THREE.Vector3(0,-1,0)); ray.far=3;
-  const g=ray.intersectObjects(walkables,false).find(h=>h.object.visible);
+  ray.set(rayO.set(camera.position.x,feet+0.45,camera.position.z),down); ray.far=3;
+  const g=ray.intersectObjects(nearWalkables,false).find(h=>rayable(h.object));
   if(g){ feet += (g.point.y-feet)*Math.min(1,dt*12); onOutdoor=OUTDOOR.test(g.object.name); }
   camera.position.y=feet+EYE;
-  // no shadows yet, so daylight would shine through the earth cover: fade it out once past the blast door
+  // no shadows, so daylight would shine through the earth cover: fade it out once past the blast door
   const target = interiorBox ? ((interiorBox.containsPoint(camera.position) && !onOutdoor)?1:0) : THREE.MathUtils.clamp((0.6 - camera.position.z)/1.5, 0, 1);
   inside += (target-inside)*Math.min(1,dt*3);
   hemi.intensity = THREE.MathUtils.lerp(0.6, 0.1, inside);
   if(sun) sun.intensity = sun.userData.base*(1-inside);
+  // fog: outdoor values outside, short interior fog inside (same Fog object, no recompiles)
+  scene.fog.near=THREE.MathUtils.lerp(OUTFOG.near,INFOG.near,inside);
+  scene.fog.far=THREE.MathUtils.lerp(OUTFOG.far,INFOG.far,inside);
+  scene.fog.color.copy(OUTFOG.color).lerp(INFOG.color,inside);
+  if(now-tPool>250){ tPool=now; updatePool(); }
+  if(now-tCull>250){ tCull=now; const cull=inside>0.5, c=camera.position;
+    for(const m of chunks){ const s=m.geometry.boundingSphere; m.visible = !cull || c.distanceTo(s.center)-s.radius<=CULL_M; } }
   const room=findCurrentRoom(camera.position.x, camera.position.z, feet);
   currentRoomName = room?room.name:'';
-  roomLabelEl.textContent = currentRoomName || '—';
-  posEl.textContent=`x ${camera.position.x.toFixed(1)}  z ${camera.position.z.toFixed(1)}`+(currentRoomName?' · '+currentRoomName:'');
-  drawMini();
-  if(bigMapOpen) drawBigMap();
+  // minimap/HUD at most ~10 fps, and only when something changed
+  if(now-tMini>100){
+    const p=camera.position, ch=Math.abs(p.x-mmX)+Math.abs(p.z-mmZ)>0.02 || Math.abs(yaw-mmYaw)>0.005 || mmRoom!==currentRoomName;
+    if(ch){ tMini=now; mmX=p.x; mmZ=p.z; mmYaw=yaw;
+      if(mmRoom!==currentRoomName){ mmRoom=currentRoomName; roomLabelEl.textContent = currentRoomName || '—'; }
+      posEl.textContent=`x ${p.x.toFixed(1)}  z ${p.z.toFixed(1)}`+(currentRoomName?' · '+currentRoomName:'');
+      drawMini(); if(bigMapOpen) drawBigMap(); }
+  }
   renderer.render(scene,camera);
+  lastCalls=renderer.info.render.calls;
+  fpsFrames++;
+  if(now-fpsT>=500){ fpsNow=Math.round(fpsFrames*1000/(now-fpsT)); fpsFrames=0; fpsT=now;
+    fpsEl.textContent=`${fpsNow} fps · ${lastCalls} draw calls`;
+    if(qs.has('perf')) console.log('DRAWCALLS '+lastCalls+' tris '+renderer.info.render.triangles+' prog '+renderer.info.programs.length+' fps '+fpsNow); }
 });
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);mmX=1e9;});
 </script>
 <script>
 // Update check: githack caches /main/ for a while, so compare against the latest commit
