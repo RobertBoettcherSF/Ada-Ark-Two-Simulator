@@ -1,6 +1,6 @@
 # Ada Ark Two Simulator
 
-A browser walk-through and simulation of Ark Two, the community fallout shelter near Horning's Mills, Ontario, built by Bruce M. Beach. Made in his memory.
+A browser walk-through and simulation of Ark Two, the community fallout shelter in Ontario, Canada, built by Bruce M. Beach. Made in his memory.
 
 Shown in its ideal, working state.
 
