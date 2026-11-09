@@ -82,7 +82,7 @@ const qp=new URLSearchParams(location.search).get('pos');
 
 const colliders=[], scaleRefs=[], walkables=[];
 let feet=0, interiorBox=null;
-new GLTFLoader().load(MODEL, g=>{
+const onModel = g=>{
   g.scene.updateMatrixWorld(true);
   const zone=g.scene.getObjectByName('Zone_Interior');
   if(zone){ interiorBox=new THREE.Box3().setFromObject(zone); zone.visible=false; }
@@ -108,7 +108,13 @@ new GLTFLoader().load(MODEL, g=>{
     if(ind.length) feet=ind[ind.length-1].point.y; else if(hs.length) feet=hs[0].point.y; }
   const s=document.getElementById('start');
   s.textContent = touch ? 'Tap to start' : 'Click to start walking';
-}, undefined, e=>{document.getElementById('start').textContent='Could not load model: '+e.message; window.arkCheck&&window.arkCheck(true);});
+};
+// a commit-pinned page may not have a newer build yet: fall back to the file on main
+const FALLBACK='https://raw.githubusercontent.com/RobertBoettcherSF/Ada-Ark-Two-Simulator/main/assets/'+BUILD+'.glb';
+const onFail = e=>{document.getElementById('start').textContent='Could not load model: '+e.message; window.arkCheck&&window.arkCheck(true);};
+new GLTFLoader().load(MODEL, onModel, undefined, e=>{
+  if(location.hostname.endsWith('githack.com')) new GLTFLoader().load(FALLBACK, onModel, undefined, onFail); else onFail(e);
+});
 
 // --- input
 const keys={};
@@ -242,7 +248,7 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
     }catch(e){}
   }
   window.arkCheck=check;
-  if(location.hostname.endsWith('githack.com')){check();setInterval(check,120000);}
+  if(location.hostname.endsWith('githack.com')){check();setInterval(()=>{ if(!document.hidden) check(); },600000);}
   const v=document.createElement('div');v.style.cssText='position:fixed;right:8px;bottom:6px;font-size:11px;opacity:.5';
   v.textContent='build '+(pinned?ref.slice(0,7):ref);document.body.appendChild(v);
 })();
