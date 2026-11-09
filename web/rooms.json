@@ -1,0 +1,420 @@
+[
+ {
+  "id": "N01",
+  "name": "Reception Area",
+  "pos": [
+   -13.95,
+   -28.6,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N02",
+  "name": "Decontamination",
+  "pos": [
+   -13.8,
+   -25.55,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "H_WSA",
+  "name": "Women's Separate Area",
+  "pos": [
+   -39.49,
+   -22.06,
+   0
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N03",
+  "name": "Roller Track Room",
+  "pos": [
+   -36.89,
+   -29.0,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N04",
+  "name": "Future Surgery",
+  "pos": [
+   -36.89,
+   -25.48,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N05",
+  "name": "Adult Women Bunk Room",
+  "pos": [
+   -36.89,
+   -19.55,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N06",
+  "name": "Women's Washroom",
+  "pos": [
+   -36.89,
+   -16.25,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N12",
+  "name": "Men's Washroom",
+  "pos": [
+   -36.75,
+   -13.03,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S01",
+  "name": "Storage Room with Steel Grate Door",
+  "pos": [
+   -42.09,
+   -29.0,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S02",
+  "name": "Teenage Girls Day Room",
+  "pos": [
+   -42.09,
+   -25.62,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S10",
+  "name": "Teenage Girls Bunk Room",
+  "pos": [
+   -41.77,
+   -22.32,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S03",
+  "name": "Young Girls Day Room",
+  "pos": [
+   -42.09,
+   -18.95,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S11",
+  "name": "Young Girls Bunk Room",
+  "pos": [
+   -41.77,
+   -15.8,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S04",
+  "name": "Adult Day Room with Caged Pharmacy",
+  "pos": [
+   -42.09,
+   -12.65,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "H_GEN",
+  "name": "General Hallway & Sitting Area",
+  "pos": [
+   -39.49,
+   1.97,
+   0
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "H_SPUR",
+  "name": "General Hallway & Sitting Area (north spur)",
+  "pos": [
+   -25.54,
+   -9.72,
+   0
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "W03",
+  "name": "Silent Library",
+  "pos": [
+   -21.71,
+   -12.32,
+   0
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "W02",
+  "name": "Nursery with Cry Room",
+  "pos": [
+   -18.26,
+   -12.32,
+   0
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "W01",
+  "name": "X-Ray & Dentist Chair",
+  "pos": [
+   -14.74,
+   -12.32,
+   0
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "E03",
+  "name": "Bunk Room for 90 Small Children",
+  "pos": [
+   -14.14,
+   -7.51,
+   180
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "E01",
+  "name": "Children's Playroom",
+  "pos": [
+   -17.36,
+   -7.12,
+   -180
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "E02",
+  "name": "Conference Room",
+  "pos": [
+   -20.51,
+   -7.12,
+   -180
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "E04",
+  "name": "Command Room",
+  "pos": [
+   -23.81,
+   -7.36,
+   180
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N14",
+  "name": "Generators",
+  "pos": [
+   -25.7,
+   -5.3,
+   0
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N07",
+  "name": "Computer Room",
+  "pos": [
+   -36.89,
+   -1.25,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N08",
+  "name": "Young Boys Day Room",
+  "pos": [
+   -36.89,
+   1.9,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N13",
+  "name": "Young Boys Bunk Room",
+  "pos": [
+   -37.2,
+   5.28,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N09",
+  "name": "Tool Room",
+  "pos": [
+   -36.89,
+   8.5,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S12",
+  "name": "Adult Men Bunk Room",
+  "pos": [
+   -41.77,
+   -9.57,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S05",
+  "name": "Teenage Boys Bunk Room",
+  "pos": [
+   -42.09,
+   -2.08,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S13",
+  "name": "Teenage Boys Day Room",
+  "pos": [
+   -41.92,
+   -5.53,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S06",
+  "name": "Broadcast Electronics Room / Chapel",
+  "pos": [
+   -42.09,
+   1.38,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S07",
+  "name": "Transmitter Room",
+  "pos": [
+   -42.09,
+   4.75,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S08",
+  "name": "Storage Room with Steel Grill",
+  "pos": [
+   -42.09,
+   8.12,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S14",
+  "name": "5,000 Gallon Water Tank Room",
+  "pos": [
+   -50.17,
+   11.5,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "S09",
+  "name": "Laundry Room",
+  "pos": [
+   -42.09,
+   14.8,
+   90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N10",
+  "name": "Dish Sink Room",
+  "pos": [
+   -36.89,
+   11.65,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ },
+ {
+  "id": "N11",
+  "name": "Kitchen",
+  "pos": [
+   -36.89,
+   15.03,
+   -90
+  ],
+  "status": "in_game",
+  "notes": ""
+ }
+]

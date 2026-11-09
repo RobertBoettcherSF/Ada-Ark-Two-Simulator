@@ -83,7 +83,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 
-const MODEL = '../assets/' + (new URLSearchParams(location.search).get('build') || 'ark_two_v008_1') + '.glb';
+const MODEL = '../assets/' + (new URLSearchParams(location.search).get('build') || 'ark_two_v008_2') + '.glb';
 const BUILD = MODEL.split('/').pop().replace('.glb','');
 const WALKRE = /(Floor|Threshold)$|^Ground_Soil|^Apron|^AB_Ramp_[AB]$/, OUTDOOR = /^(Ground_Soil|Apron)/;
 const EYE = 1.65, RADIUS = 0.3, WALK = 1.6, RUN = 3.2;
@@ -490,7 +490,8 @@ function dl(blob,name){const a=document.createElement('a');a.href=URL.createObje
 // --- dev room list: jump to a room, mark status (open / in progress / done)
 const ST=['open','in progress','done'], STI={'open':'☐','in progress':'◐','done':'✅'};
 let roomStatus={}; try{ roomStatus=JSON.parse(localStorage.getItem('arkRoomStatus')||'{}'); }catch(e){}
-fetch('rooms_status.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{ if(j){ for(const k in j) if(!(k in roomStatus)) roomStatus[k]=j[k]; buildRoomList(); } }).catch(()=>{});
+let roomsMeta=null; // Blender's rooms.json: [{id,name,pos:[x,z,yaw],status,notes}] in design-doc chapter 22 order
+fetch('rooms.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{ if(Array.isArray(j)&&j.length){ roomsMeta=j; buildRoomList(); } }).catch(()=>{});
 const rlEl=document.getElementById('roomList');
 if(touch || localStorage.getItem('arkRoomListCollapsed')==='1') rlEl.classList.add('collapsed');
 function toggleRoomList(){ rlEl.classList.toggle('collapsed'); localStorage.setItem('arkRoomListCollapsed', rlEl.classList.contains('collapsed')?'1':'0');
@@ -505,16 +506,20 @@ function roomPoint(r){ // a point inside the polygon, near its centre
     if(pointInPoly(x,z,o)){ const d=(x-cx)**2+(z-cz)**2; if(d<bd){bd=d;best=[x,z];} } }
   return best||[o[0][0],o[0][1]];
 }
-function jumpToRoom(r){
-  const [x,z]=roomPoint(r); camera.position.x=x; camera.position.z=z;
-  const top=(r.floorY!=null?r.floorY:feet)+1.6;
-  const rc=new THREE.Raycaster(new THREE.Vector3(x,top,z),new THREE.Vector3(0,-1,0));
-  const hs=rc.intersectObjects(walkables,false); if(hs.length) feet=hs[0].point.y; else if(r.floorY!=null) feet=r.floorY;
+function jumpToRoom(r,pos){
+  let x,z; if(pos&&pos.length>=2&&isFinite(pos[0])&&isFinite(pos[1])){ [x,z]=pos; if(isFinite(pos[2])) yaw=pos[2]/57.2958; } else [x,z]=roomPoint(r);
+  camera.position.x=x; camera.position.z=z;
+  const fy = r.floorY!=null ? r.floorY : (rooms.find(q=>q.name===r.name)?.floorY ?? null);
+  const rc=new THREE.Raycaster(new THREE.Vector3(x,fy!=null?fy+1.6:100,z),new THREE.Vector3(0,-1,0));
+  const hs=rc.intersectObjects(walkables,false), ind=hs.filter(h=>!OUTDOOR.test(h.object.name));
+  if(fy!=null && hs.length) feet=hs[0].point.y; else if(ind.length) feet=ind[ind.length-1].point.y; else if(fy!=null) feet=fy; else if(hs.length) feet=hs[0].point.y;
   rebuildNear(true); updatePool(); toast(r.name);
 }
 function buildRoomList(){
   const bd=document.getElementById('rlBd'); if(!bd) return; bd.innerHTML='';
-  const list=rooms.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  const byName=new Map(rooms.map(r=>[r.name,r]));
+  const list = roomsMeta ? roomsMeta.map(m=>Object.assign({}, byName.get(m.name)||{name:m.name,outline:null,floorY:null}, {meta:m}))
+                         : rooms.slice().sort((a,b)=>a.name.localeCompare(b.name));
   let done=0; for(const r of list) if(roomStatus[r.name]==='done') done++;
   document.getElementById('rlHd').textContent='Rooms '+done+'/'+list.length+' done  (L)';
   for(const r of list){
@@ -522,8 +527,9 @@ function buildRoomList(){
     const st=document.createElement('span'); st.className='st'; const cur=roomStatus[r.name]||'open'; st.textContent=STI[cur]; st.title=cur+' (tap to change)';
     st.onclick=e=>{ e.stopPropagation(); const n=ST[(ST.indexOf(roomStatus[r.name]||'open')+1)%3]; roomStatus[r.name]=n;
       localStorage.setItem('arkRoomStatus',JSON.stringify(roomStatus)); buildRoomList(); };
-    const nm=document.createElement('span'); nm.className='nm'; nm.textContent=r.name; nm.title='Jump here';
-    nm.onclick=e=>{ e.stopPropagation(); jumpToRoom(r); };
+    const nm=document.createElement('span'); nm.className='nm'; nm.textContent=(r.meta?r.meta.id+'  ':'')+r.name;
+    nm.title='Jump here'+(r.meta?' · model: '+String(r.meta.status||'').replace(/_/g,' ')+(r.meta.notes?' · '+r.meta.notes:''):'');
+    nm.onclick=e=>{ e.stopPropagation(); if(r.outline||r.meta?.pos) jumpToRoom(r, r.meta?.pos); };
     row.append(st,nm); bd.append(row);
   }
 }
