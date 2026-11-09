@@ -73,7 +73,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 
-const MODEL = '../assets/' + (new URLSearchParams(location.search).get('build') || 'ark_two_v008') + '.glb';
+const MODEL = '../assets/' + (new URLSearchParams(location.search).get('build') || 'ark_two_v008_1') + '.glb';
 const BUILD = MODEL.split('/').pop().replace('.glb','');
 const WALKRE = /(Floor|Threshold)$|^Ground_Soil|^Apron|^AB_Ramp_[AB]$/, OUTDOOR = /^(Ground_Soil|Apron)/;
 const EYE = 1.65, RADIUS = 0.3, WALK = 1.6, RUN = 3.2;
@@ -183,7 +183,7 @@ async function tryPlanJson(){
     const r=await fetch('plan.json',{cache:'no-store'});
     if(!r.ok) return null;
     const j=await r.json();
-    if(j.version && j.version!==BUILD.replace('ark_two_','')) return null; // plan belongs to another build
+    if(j.version && !BUILD.replace('ark_two_','').startsWith(j.version)) return null; // plan belongs to another build
     const list=Array.isArray(j)?j:(j.rooms||null);
     if(!Array.isArray(list)||!list.length) return null;
     const out=[];
