@@ -1,0 +1,17 @@
+{
+  "_note": "Sky and ground hues sampled from internal surface reference (Video 4, 02:12-02:23, clear summer day). Colour values only; no footage.",
+  "sky": {
+    "zenith":  "#6d96c0",
+    "upper":   "#7aa6cc",
+    "horizon": "#84aecf",
+    "cloud":   "#b6cae1",
+    "cloud_cover": 0.15
+  },
+  "ground": {
+    "grass_sunlit": "#617b26",
+    "grass_shade":  "#4c6328",
+    "treeline_haze": "#7b8c83"
+  },
+  "sun": { "elevation_deg": 55, "color": "#fff4e0", "intensity": 3.0 },
+  "fog": { "color": "#9db8cf", "near_m": 60, "far_m": 400 }
+}
