@@ -75,12 +75,13 @@ camera.position.set(0,EYE,9);
 // ?pos=x,z,yawDeg  lets a debug snapshot be reopened at the same spot
 const qp=new URLSearchParams(location.search).get('pos');
 
-const colliders=[], scaleRefs=[];
+const colliders=[], scaleRefs=[], walkables=[];
+let feet=0;
 new GLTFLoader().load(MODEL, g=>{
   g.scene.traverse(o=>{
     if(o.isLight){ o.intensity = o.isDirectionalLight ? Math.min(o.intensity,3) : Math.min(o.intensity,8); if(o.isDirectionalLight){ sun=o; o.castShadow=true; o.shadow.mapSize.set(2048,2048); const sc=o.shadow.camera; sc.left=sc.bottom=-30; sc.right=sc.top=30; sc.near=0.5; sc.far=200; o.shadow.bias=-0.0005; o.shadow.normalBias=0.03; } else lamps.push(o); o.userData.base=o.intensity; }
     if(o.isMesh){
-      o.castShadow=true; o.receiveShadow=true;
+      o.castShadow=true; o.receiveShadow=true; walkables.push(o);
       if(SKY?.ground && o.material?.name==='Grass_Mound') o.material.color.set(SKY.ground.grass_sunlit);
       if(o.name.startsWith('ScaleRef_')){ o.visible=false; scaleRefs.push(o); return; }
       if(!/Floor|Ground_Soil|Apron|Threshold|Bulb|Sign_/.test(o.name)) colliders.push(o);
@@ -135,8 +136,8 @@ document.getElementById('dbg').onclick=snapshot;
 // --- movement with wall collision
 const ray=new THREE.Raycaster();
 function blocked(from,dir,dist){
-  for(const h of [0.4,1.2]){
-    ray.set(new THREE.Vector3(from.x,h,from.z),dir); ray.far=dist+RADIUS;
+  for(const h of [0.5,1.2]){
+    ray.set(new THREE.Vector3(from.x,feet+h,from.z),dir); ray.far=dist+RADIUS;
     if(ray.intersectObjects(colliders,false).length) return true;
   }
   return false;
@@ -183,7 +184,11 @@ renderer.setAnimationLoop(()=>{
   pitch=Math.max(-1.4,Math.min(1.4,pitch));
   camera.rotation.set(pitch,yaw,0);
   if(started) move(dt);
-  camera.position.y=EYE;
+  // follow floors and ramps: highest walkable surface under the feet, up to 0.45 m step-up
+  ray.set(new THREE.Vector3(camera.position.x,feet+0.45,camera.position.z),new THREE.Vector3(0,-1,0)); ray.far=3;
+  const g=ray.intersectObjects(walkables,false).find(h=>h.object.visible);
+  if(g) feet += (g.point.y-feet)*Math.min(1,dt*12);
+  camera.position.y=feet+EYE;
   // no shadows yet, so daylight would shine through the earth cover: fade it out once past the blast door
   const inside = THREE.MathUtils.clamp((0.6 - camera.position.z)/1.5, 0, 1);
   hemi.intensity = THREE.MathUtils.lerp(0.6, 0.1, inside);
