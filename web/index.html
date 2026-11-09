@@ -84,7 +84,7 @@ new GLTFLoader().load(MODEL, g=>{
       o.castShadow=true; o.receiveShadow=true; walkables.push(o);
       if(SKY?.ground && o.material?.name==='Grass_Mound') o.material.color.set(SKY.ground.grass_sunlit);
       if(o.name.startsWith('ScaleRef_')){ o.visible=false; scaleRefs.push(o); return; }
-      if(!/Floor|Ground_Soil|Apron|Threshold|Bulb|Sign_/.test(o.name)) colliders.push(o);
+      if(!/Floor|Ramp|Ground_Soil|Apron|Threshold|Bulb|Sign_/.test(o.name)) colliders.push(o);
     }
   });
   scene.add(g.scene);
