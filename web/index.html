@@ -7,14 +7,29 @@
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#111;font-family:system-ui,sans-serif;color:#eee;touch-action:none}
   canvas{display:block}
-  #hud{position:fixed;left:10px;top:10px;font-size:13px;background:rgba(0,0,0,.55);padding:8px 10px;border-radius:6px;max-width:320px;line-height:1.4}
+  #hud{position:fixed;left:10px;top:10px;font-size:13px;background:rgba(0,0,0,.55);padding:8px 10px;border-radius:6px;max-width:320px;line-height:1.4;z-index:5}
   #hud b{color:#f6c64a}
-  #start{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);cursor:pointer;font-size:20px;text-align:center}
-  #toast{position:fixed;right:12px;bottom:12px;background:#2c5a2e;padding:6px 10px;border-radius:6px;display:none}
-  #stick{position:fixed;left:24px;bottom:24px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);display:none}
+  #start{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);cursor:pointer;font-size:20px;text-align:center;z-index:20}
+  #toast{position:fixed;right:12px;bottom:12px;background:#2c5a2e;padding:6px 10px;border-radius:6px;display:none;z-index:15}
+  #stick{position:fixed;left:24px;bottom:24px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);display:none;z-index:5}
   #knob{position:absolute;left:40px;top:40px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.45)}
-  #dbg{position:fixed;right:12px;top:12px;display:none;padding:8px 12px;font-size:14px;border:0;border-radius:6px;background:#444;color:#fff}
+  #dbg{position:fixed;right:12px;top:12px;display:none;padding:8px 12px;font-size:14px;border:0;border-radius:6px;background:#444;color:#fff;z-index:5}
   #upd{position:fixed;left:50%;top:12px;transform:translateX(-50%);display:none;padding:10px 16px;font-size:15px;border:0;border-radius:8px;background:#f6c64a;color:#111;font-weight:600;z-index:10}
+  #minimapWrap{position:fixed;right:10px;top:10px;z-index:6;display:flex;flex-direction:column;align-items:stretch;gap:4px;width:min(200px,28vw);pointer-events:auto;cursor:pointer}
+  #minimap{width:100%;aspect-ratio:1;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.2);border-radius:8px;display:block}
+  #roomLabel{font-size:14px;font-weight:600;text-align:center;background:rgba(0,0,0,.55);padding:4px 6px;border-radius:6px;line-height:1.2;min-height:1.2em}
+  #gear{position:fixed;left:10px;top:96px;z-index:6;width:40px;height:40px;border:0;border-radius:8px;background:rgba(0,0,0,.55);color:#eee;font-size:20px;cursor:pointer;line-height:1}
+  #settings{position:fixed;left:10px;top:144px;z-index:12;display:none;background:rgba(0,0,0,.85);padding:14px 16px;border-radius:10px;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+  #settings h3{margin:0 0 10px;font-size:15px;color:#f6c64a}
+  #settings label{display:block;font-size:13px;margin:10px 0 4px}
+  #settings input[type=range]{width:100%}
+  #settings .vals{font-size:12px;opacity:.75;margin-top:2px}
+  #settings .close{margin-top:12px;padding:6px 12px;border:0;border-radius:6px;background:#444;color:#fff;cursor:pointer;width:100%}
+  #bigMap{position:fixed;inset:0;z-index:30;display:none;background:rgba(0,0,0,.88);align-items:center;justify-content:center;flex-direction:column;gap:8px;cursor:pointer}
+  #bigMap.show{display:flex}
+  #bigMap canvas{max-width:min(920px,94vw);max-height:min(820px,82vh);width:auto;height:auto;background:rgba(20,24,28,.95);border:1px solid rgba(255,255,255,.25);border-radius:10px}
+  #bigMap .title{font-size:18px;font-weight:700;color:#f6c64a}
+  #bigMap .hint{font-size:12px;opacity:.7}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -23,8 +38,28 @@
 </head>
 <body>
 <div id="hud"><b>Ark Two</b> · <span id="bname">walk-through</span><br>
-<span id="help">W A S D move · mouse look · Shift run · R scale refs · F9 debug snapshot · Esc release mouse</span><br>
+<span id="help">W A S D move · mouse look · Shift run · R scale refs · M map · F9 debug · Esc release</span><br>
 <span id="pos"></span></div>
+<button id="gear" title="Einstellungen" aria-label="Einstellungen">⚙</button>
+<div id="settings">
+  <h3>Einstellungen</h3>
+  <label for="slBright">Helligkeit allgemein</label>
+  <input id="slBright" type="range" min="0.3" max="2" step="0.05" value="1">
+  <div class="vals" id="vBright">1.00</div>
+  <label for="slBunker">Bunkerbeleuchtung</label>
+  <input id="slBunker" type="range" min="0" max="2" step="0.05" value="1">
+  <div class="vals" id="vBunker">1.00</div>
+  <button class="close" id="setClose">Schließen</button>
+</div>
+<div id="minimapWrap" title="Tippen für große Karte">
+  <canvas id="minimap" width="200" height="200"></canvas>
+  <div id="roomLabel">—</div>
+</div>
+<div id="bigMap">
+  <div class="title">Sie sind hier</div>
+  <canvas id="bigMapCv" width="900" height="700"></canvas>
+  <div class="hint">M oder Esc zum Schließen · Tippen schließt</div>
+</div>
 <div id="start">Loading model…</div>
 <div id="stick"><div id="knob"></div></div>
 <button id="dbg">Debug</button>
@@ -40,6 +75,7 @@ const WALKRE = /(Floor|Threshold)$|^Ground_Soil|^Apron|^AB_Ramp_[AB]$/, OUTDOOR 
 const EYE = 1.65, RADIUS = 0.3, WALK = 1.6, RUN = 3.2;
 document.getElementById('bname').textContent = BUILD.replace('ark_two_','') + ' walk-through';
 const touch = matchMedia('(pointer: coarse)').matches;
+const qs = new URLSearchParams(location.search);
 
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -57,6 +93,7 @@ scene.background = C(sky.horizon);
 scene.fog = new THREE.Fog(C(fog.color), fog.near_m, fog.far_m);
 const hemi=new THREE.HemisphereLight(C(sky.upper), C(SKY?.ground?.grass_shade ?? '#4c6328'), 0.6); scene.add(hemi);
 let sun=null; const lamps=[];
+let bunkerLights=[]; // Point/Spot used for Bunkerbeleuchtung
 // gradient sky dome with soft procedural clouds, colours from data/sky.json
 scene.add(new THREE.Mesh(new THREE.SphereGeometry(450,32,16), new THREE.ShaderMaterial({
   side:THREE.BackSide, depthWrite:false, fog:false,
@@ -78,10 +115,103 @@ const camera = new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.05,1000);
 camera.rotation.order='YXZ';
 camera.position.set(0,EYE,9);
 // ?pos=x,z,yawDeg  lets a debug snapshot be reopened at the same spot
-const qp=new URLSearchParams(location.search).get('pos');
+const qp=qs.get('pos');
 
 const colliders=[], scaleRefs=[], walkables=[];
 let feet=0, interiorBox=null;
+let rooms=[]; // {name, outline:[[x,z]...], door?, floorY?, area}
+let currentRoomName='';
+let brightGeneral = +localStorage.getItem('arkBright') || 1;
+let bunkerBright = localStorage.getItem('arkBunker');
+bunkerBright = bunkerBright===null ? 1 : +bunkerBright;
+brightGeneral = Math.min(2, Math.max(0.3, brightGeneral));
+bunkerBright = Math.min(2, Math.max(0, bunkerBright));
+renderer.toneMappingExposure = brightGeneral;
+
+function deriveRoomName(n){
+  if(/^(Spine_|Spur_)/.test(n)) return 'General Hallway & Sitting Area';
+  if(/^(Entrance|Ramp|Landing|AB_Ramp|TopLanding|BottomLanding)/.test(n)) return 'Entrance';
+  let s = n.replace(/_Floor$/,'');
+  s = s.replace(/^Room_[A-Za-z]?\d+_/,'');
+  s = s.replace(/^Room_/,'');
+  s = s.replace(/(Women|Men|Children)S(?=[A-Z])/g, "$1's");
+  s = s.replace(/([a-z\d])([A-Z])/g,'$1 $2').replace(/_/g,' ');
+  s = s.replace(/\s+/g,' ').trim();
+  return s || n;
+}
+function polyArea(outline){
+  let a=0; for(let i=0,j=outline.length-1;i<outline.length;j=i++){ const[xi,zi]=outline[i],[xj,zj]=outline[j]; a+=(xj*zi-xi*zj); }
+  return Math.abs(a)*0.5;
+}
+function pointInPoly(x,z,outline){
+  let inside=false;
+  for(let i=0,j=outline.length-1;i<outline.length;j=i++){
+    const[xi,zi]=outline[i],[xj,zj]=outline[j];
+    if(((zi>z)!==(zj>z)) && (x < (xj-xi)*(z-zi)/(zj-zi+1e-12)+xi)) inside=!inside;
+  }
+  return inside;
+}
+function roomsFromModel(root){
+  const out=[];
+  root.traverse(o=>{
+    if(!o.isMesh) return;
+    if(!/Floor$/.test(o.name)) return;
+    if(/^(Apron_|Ground_Soil)/.test(o.name)) return;
+    const box=new THREE.Box3().setFromObject(o);
+    if(!isFinite(box.min.x)) return;
+    const outline=[[box.min.x,box.min.z],[box.max.x,box.min.z],[box.max.x,box.max.z],[box.min.x,box.max.z]];
+    const name=(o.userData && o.userData.room) || deriveRoomName(o.name);
+    out.push({name, outline, floorY:(box.min.y+box.max.y)*0.5, area:polyArea(outline)});
+  });
+  return out;
+}
+async function tryPlanJson(){
+  try{
+    const r=await fetch('plan.json',{cache:'no-store'});
+    if(!r.ok) return null;
+    const j=await r.json();
+    const list=Array.isArray(j)?j:(j.rooms||null);
+    if(!Array.isArray(list)||!list.length) return null;
+    const out=[];
+    for(const raw of list){
+      if(!raw||typeof raw!=='object') continue;
+      const name=raw.name||raw.Name||'';
+      let outline=raw.outline||raw.polygon||raw.poly||raw.bounds;
+      if(!outline && raw.min && raw.max){
+        const[ax,az]=raw.min,[bx,bz]=raw.max;
+        outline=[[ax,az],[bx,az],[bx,bz],[ax,bz]];
+      }
+      if(!name||!Array.isArray(outline)||outline.length<3) continue;
+      const pts=outline.map(p=>Array.isArray(p)?[+p[0],+p[1]]:[+p.x,+p.z]);
+      if(pts.some(p=>p.some(n=>!isFinite(n)))) continue;
+      const door=raw.door? (Array.isArray(raw.door)?[+raw.door[0],+raw.door[1]]:[+raw.door.x,+raw.door.z]) : null;
+      out.push({name, outline:pts, door, floorY: raw.floorY ?? raw.y ?? null, area:polyArea(pts)});
+    }
+    return out.length?out:null;
+  }catch(e){ return null; }
+}
+function pickBunkerLights(){
+  const named=lamps.filter(o=>/^Light_Bunker_/.test(o.name));
+  if(named.length) return named;
+  return lamps.filter(o=>o.isPointLight||o.isSpotLight);
+}
+function applyBunkerLights(){
+  for(const L of bunkerLights){
+    const base=L.userData.base ?? L.intensity;
+    L.intensity = base * bunkerBright;
+  }
+}
+function findCurrentRoom(x,z,y){
+  const hits=[];
+  for(const r of rooms){
+    if(r.floorY!=null && isFinite(r.floorY) && Math.abs(r.floorY-y)>3) continue;
+    if(pointInPoly(x,z,r.outline)) hits.push(r);
+  }
+  if(!hits.length) return null;
+  hits.sort((a,b)=>(a.area||1e9)-(b.area||1e9));
+  return hits[0];
+}
+
 const onModel = g=>{
   g.scene.updateMatrixWorld(true);
   const zone=g.scene.getObjectByName('Zone_Interior');
@@ -101,13 +231,22 @@ const onModel = g=>{
     }
   });
   scene.add(g.scene);
+  bunkerLights=pickBunkerLights();
+  applyBunkerLights();
   if(qp){ // ?pos= has no height: stand on the lowest walkable floor under that point (interiors lie below the mound)
     g.scene.updateMatrixWorld(true);
     const rc=new THREE.Raycaster(new THREE.Vector3(camera.position.x,100,camera.position.z),new THREE.Vector3(0,-1,0));
     const hs=rc.intersectObjects(walkables,false), ind=hs.filter(h=>!OUTDOOR.test(h.object.name));
     if(ind.length) feet=ind[ind.length-1].point.y; else if(hs.length) feet=hs[0].point.y; }
+  // rooms: prefer plan.json, else derive from floors
+  tryPlanJson().then(plan=>{
+    rooms = plan || roomsFromModel(g.scene);
+  });
+  // also set immediately from model so first frames work; plan replaces if found
+  if(!rooms.length) rooms = roomsFromModel(g.scene);
   const s=document.getElementById('start');
   s.textContent = touch ? 'Tap to start' : 'Click to start walking';
+  if(qs.get('map')==='1') openBigMap(true);
 };
 // a commit-pinned page may not have a newer build yet: fall back to the file on main
 const FALLBACK='https://raw.githubusercontent.com/RobertBoettcherSF/Ada-Ark-Two-Simulator/main/assets/'+BUILD+'.glb';
@@ -115,6 +254,40 @@ const onFail = e=>{document.getElementById('start').textContent='Could not load 
 new GLTFLoader().load(MODEL, onModel, undefined, e=>{
   if(location.hostname.endsWith('githack.com')) new GLTFLoader().load(FALLBACK, onModel, undefined, onFail); else onFail(e);
 });
+
+// --- UI: settings + maps
+let settingsOpen=false, bigMapOpen=false;
+const uiBlocked=()=>settingsOpen||bigMapOpen;
+function releaseLock(){ if(document.pointerLockElement) document.exitPointerLock(); }
+function openSettings(on){
+  settingsOpen=!!on;
+  document.getElementById('settings').style.display=settingsOpen?'block':'none';
+  if(settingsOpen){ releaseLock(); syncSliders(); }
+}
+function openBigMap(on){
+  bigMapOpen=!!on;
+  document.getElementById('bigMap').classList.toggle('show', bigMapOpen);
+  if(bigMapOpen){ releaseLock(); drawBigMap(); }
+}
+function syncSliders(){
+  document.getElementById('slBright').value=brightGeneral;
+  document.getElementById('slBunker').value=bunkerBright;
+  document.getElementById('vBright').textContent=brightGeneral.toFixed(2);
+  document.getElementById('vBunker').textContent=bunkerBright.toFixed(2);
+}
+document.getElementById('gear').onclick=e=>{ e.stopPropagation(); openSettings(!settingsOpen); };
+document.getElementById('setClose').onclick=e=>{ e.stopPropagation(); openSettings(false); };
+document.getElementById('slBright').oninput=e=>{
+  brightGeneral=+e.target.value; localStorage.setItem('arkBright', String(brightGeneral));
+  renderer.toneMappingExposure=brightGeneral; document.getElementById('vBright').textContent=brightGeneral.toFixed(2);
+};
+document.getElementById('slBunker').oninput=e=>{
+  bunkerBright=+e.target.value; localStorage.setItem('arkBunker', String(bunkerBright));
+  applyBunkerLights(); document.getElementById('vBunker').textContent=bunkerBright.toFixed(2);
+};
+document.getElementById('minimapWrap').onclick=e=>{ e.stopPropagation(); openBigMap(true); };
+document.getElementById('bigMap').onclick=()=>openBigMap(false);
+syncSliders();
 
 // --- input
 const keys={};
@@ -124,12 +297,20 @@ const startEl=document.getElementById('start');
 startEl.onclick=()=>{
   startEl.style.display='none'; started=true;
   if(touch){document.getElementById('stick').style.display='block';document.getElementById('dbg').style.display='block';
-    document.getElementById('help').textContent='Left stick move · drag right side to look · Debug button for snapshot';}
-  else renderer.domElement.requestPointerLock();
+    document.getElementById('help').textContent='Stick bewegen · rechts schauen · M Karte · Zahnrad Einstellungen · Debug';}
+  else if(!uiBlocked()) renderer.domElement.requestPointerLock();
 };
-renderer.domElement.addEventListener('click',()=>{ if(started&&!touch) renderer.domElement.requestPointerLock(); });
-addEventListener('mousemove',e=>{ if(document.pointerLockElement){ yaw-=e.movementX*0.0022; pitch-=e.movementY*0.0022; }});
+renderer.domElement.addEventListener('click',()=>{ if(started&&!touch&&!uiBlocked()) renderer.domElement.requestPointerLock(); });
+addEventListener('mousemove',e=>{ if(document.pointerLockElement && !uiBlocked()){ yaw-=e.movementX*0.0022; pitch-=e.movementY*0.0022; }});
 addEventListener('keydown',e=>{
+  if(e.code==='Escape'){
+    if(bigMapOpen){ e.preventDefault(); openBigMap(false); return; }
+    if(settingsOpen){ e.preventDefault(); openSettings(false); return; }
+  }
+  if(e.code==='KeyM' && !e.ctrlKey && !e.metaKey && !e.altKey){
+    e.preventDefault(); openBigMap(!bigMapOpen); return;
+  }
+  if(uiBlocked()) return;
   keys[e.code]=true;
   if(e.code==='F9'){ e.preventDefault(); snapshot(); }
   if(e.code==='KeyR'){ scaleRefs.forEach(o=>o.visible=!o.visible); toast('Scale refs '+(scaleRefs[0]?.visible?'on':'off')); }
@@ -139,12 +320,13 @@ addEventListener('keyup',e=>keys[e.code]=false);
 // touch: stick on left half, look on right half
 let stickId=null,lookId=null,sx=0,sy=0,mx=0,my=0,lx=0,ly=0;
 const knob=document.getElementById('knob');
-addEventListener('touchstart',e=>{ if(!started) return;
+addEventListener('touchstart',e=>{ if(!started||uiBlocked()) return;
   for(const t of e.changedTouches){
     if(t.clientX<innerWidth/2 && stickId===null){stickId=t.identifier;sx=t.clientX;sy=t.clientY;}
     else if(lookId===null){lookId=t.identifier;lx=t.clientX;ly=t.clientY;}
   }},{passive:true});
 addEventListener('touchmove',e=>{
+  if(uiBlocked()) return;
   for(const t of e.changedTouches){
     if(t.identifier===stickId){ mx=Math.max(-1,Math.min(1,(t.clientX-sx)/50)); my=Math.max(-1,Math.min(1,(t.clientY-sy)/50));
       knob.style.left=(40+mx*40)+'px'; knob.style.top=(40+my*40)+'px'; }
@@ -191,6 +373,8 @@ function snapshot(){
   const data={build:BUILD,commit:(location.pathname.split('/')[3]||'main'),time:new Date().toISOString(),ua:navigator.userAgent,
     camera:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),yaw_deg:+(yaw*57.2958).toFixed(1),pitch_deg:+(pitch*57.2958).toFixed(1)},
     looking_at:hit?{object:hit.object.name,distance_m:+hit.distance.toFixed(2)}:null,
+    room:currentRoomName||null,
+    brightness:{allgemein:brightGeneral, bunker:bunkerBright},
     note:prompt('Debug note (optional):')||''};
   const stamp=data.time.replace(/[:.]/g,'-');
   dl(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),`ark_debug_${stamp}.json`);
@@ -201,6 +385,105 @@ function snapshot(){
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
 function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>el.style.display='none',2500);}
 
+// --- minimap drawing
+const miniCv=document.getElementById('minimap');
+const miniCtx=miniCv.getContext('2d');
+const bigCv=document.getElementById('bigMapCv');
+const bigCtx=bigCv.getContext('2d');
+const roomLabelEl=document.getElementById('roomLabel');
+
+function worldBounds(list){
+  let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;
+  for(const r of list){
+    for(const[x,z] of r.outline){ if(x<minX)minX=x; if(x>maxX)maxX=x; if(z<minZ)minZ=z; if(z>maxZ)maxZ=z; }
+  }
+  if(!isFinite(minX)){ minX=-10;maxX=10;minZ=-10;maxZ=10; }
+  return {minX,maxX,minZ,maxZ};
+}
+function drawMap(ctx, W, H, opts){
+  const {fitAll, centerX, centerZ, viewM, labels}=opts;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='rgba(8,12,16,0.92)';
+  ctx.fillRect(0,0,W,H);
+  if(!rooms.length){
+    ctx.fillStyle='#888'; ctx.font='12px system-ui'; ctx.textAlign='center';
+    ctx.fillText('Karte lädt…', W/2, H/2); return;
+  }
+  let cx=centerX, cz=centerZ, meters=viewM||40;
+  let pad=16;
+  if(fitAll){
+    const b=worldBounds(rooms);
+    const spanX=Math.max(4,b.maxX-b.minX), spanZ=Math.max(4,b.maxZ-b.minZ);
+    meters=Math.max(spanX, spanZ)*1.12;
+    cx=(b.minX+b.maxX)*0.5; cz=(b.minZ+b.maxZ)*0.5;
+    pad=fitAll?28:16;
+  }
+  const scale=Math.min((W-pad*2)/meters, (H-pad*2)/meters);
+  const toS=(x,z)=>({
+    x: W/2 + (x-cx)*scale,
+    y: H/2 + (z-cz)*scale  // north-up: -Z is north, but with +z down on screen: larger z goes down = south. Good.
+  });
+  // wait: forward at yaw=0 is -Z (north). On screen, north should be up => smaller z should be higher => y = H/2 - (z wait)
+  // If z increases southward visually when north is -Z... In three.js Z increases toward south if north=-Z.
+  // Screen: up should be north = decreasing z. So screenY = H/2 + (z - cz)*scale means larger z (south) goes down. Correct: y = H/2 + (z-cz)*scale.
+
+  const cur=currentRoomName;
+  for(const r of rooms){
+    const pts=r.outline.map(([x,z])=>toS(x,z));
+    ctx.beginPath();
+    pts.forEach((p,i)=> i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    ctx.closePath();
+    const hi=r.name===cur;
+    ctx.fillStyle=hi?'rgba(246,198,74,0.45)':'rgba(70,110,140,0.35)';
+    ctx.strokeStyle=hi?'#f6c64a':'rgba(180,200,220,0.55)';
+    ctx.lineWidth=hi?2:1;
+    ctx.fill(); ctx.stroke();
+    if(labels){
+      let sx=0,sy=0; for(const p of pts){sx+=p.x;sy+=p.y;} sx/=pts.length; sy/=pts.length;
+      ctx.fillStyle='#e8eef4'; ctx.font=`${Math.max(9, Math.min(13, scale*1.1))}px system-ui`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      const label=r.name.length>28?r.name.slice(0,26)+'…':r.name;
+      ctx.fillText(label, sx, sy);
+    }
+  }
+  // player
+  const pp=toS(centerX, centerZ);
+  const fx=-Math.sin(yaw), fz=-Math.cos(yaw); // forward xz
+  // screen forward: dx = fx*scale, dy = fz*scale (since y grows with z)
+  const len=Math.max(10, scale*1.4);
+  const tx=pp.x+fx*len, ty=pp.y+fz*len;
+  const px=-fz, pz=fx; // perpendicular
+  ctx.beginPath();
+  ctx.moveTo(tx,ty);
+  ctx.lineTo(pp.x - fx*len*0.45 + px*len*0.4, pp.y - fz*len*0.45 + pz*len*0.4);
+  ctx.lineTo(pp.x - fx*len*0.45 - px*len*0.4, pp.y - fz*len*0.45 - pz*len*0.4);
+  ctx.closePath();
+  ctx.fillStyle='#ff5a5a';
+  ctx.fill();
+  ctx.beginPath(); ctx.arc(pp.x,pp.y, Math.max(3,scale*0.35), 0, Math.PI*2);
+  ctx.fillStyle='#fff'; ctx.fill();
+  ctx.strokeStyle='#111'; ctx.lineWidth=1; ctx.stroke();
+
+  // N marker
+  ctx.fillStyle='#9ad'; ctx.font='bold 11px system-ui'; ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('N', 6, 4);
+}
+function drawMini(){
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const css=miniCv.clientWidth||200;
+  if(miniCv.width!==Math.round(css*dpr)){ miniCv.width=Math.round(css*dpr); miniCv.height=Math.round(css*dpr); }
+  miniCtx.setTransform(dpr,0,0,dpr,0,0);
+  drawMap(miniCtx, css, css, {fitAll:false, centerX:camera.position.x, centerZ:camera.position.z, viewM:40, labels:false});
+}
+function drawBigMap(){
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const W=900, H=700;
+  bigCv.width=Math.round(W*dpr); bigCv.height=Math.round(H*dpr);
+  bigCv.style.width=W+'px'; bigCv.style.height=H+'px';
+  bigCtx.setTransform(dpr,0,0,dpr,0,0);
+  drawMap(bigCtx, W, H, {fitAll:true, centerX:camera.position.x, centerZ:camera.position.z, labels:true});
+}
+
 // --- loop
 let inside=0, onOutdoor=true;
 const clock=new THREE.Clock(), posEl=document.getElementById('pos');
@@ -208,7 +491,7 @@ renderer.setAnimationLoop(()=>{
   const dt=Math.min(clock.getDelta(),0.05);
   pitch=Math.max(-1.4,Math.min(1.4,pitch));
   camera.rotation.set(pitch,yaw,0);
-  if(started) move(dt);
+  if(started && !uiBlocked()) move(dt);
   // follow floors and ramps: highest walkable surface under the feet, up to 0.45 m step-up
   ray.set(new THREE.Vector3(camera.position.x,feet+0.45,camera.position.z),new THREE.Vector3(0,-1,0)); ray.far=3;
   const g=ray.intersectObjects(walkables,false).find(h=>h.object.visible);
@@ -219,7 +502,12 @@ renderer.setAnimationLoop(()=>{
   inside += (target-inside)*Math.min(1,dt*3);
   hemi.intensity = THREE.MathUtils.lerp(0.6, 0.1, inside);
   if(sun) sun.intensity = sun.userData.base*(1-inside);
-  posEl.textContent=`x ${camera.position.x.toFixed(1)}  z ${camera.position.z.toFixed(1)}`;
+  const room=findCurrentRoom(camera.position.x, camera.position.z, feet);
+  currentRoomName = room?room.name:'';
+  roomLabelEl.textContent = currentRoomName || '—';
+  posEl.textContent=`x ${camera.position.x.toFixed(1)}  z ${camera.position.z.toFixed(1)}`+(currentRoomName?' · '+currentRoomName:'');
+  drawMini();
+  if(bigMapOpen) drawBigMap();
   renderer.render(scene,camera);
 });
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
@@ -253,7 +541,7 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
   }
   window.arkCheck=check;
   if(location.hostname.endsWith('githack.com')){check();setInterval(()=>{ if(!document.hidden) check(); },600000);}
-  const v=document.createElement('div');v.style.cssText='position:fixed;right:8px;bottom:6px;font-size:11px;opacity:.5';
+  const v=document.createElement('div');v.style.cssText='position:fixed;right:8px;bottom:6px;font-size:11px;opacity:.5;z-index:5';
   v.textContent='build '+(pinned?ref.slice(0,7):ref);document.body.appendChild(v);
 })();
 </script>
