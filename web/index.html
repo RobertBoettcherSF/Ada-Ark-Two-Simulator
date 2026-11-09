@@ -108,7 +108,7 @@ new GLTFLoader().load(MODEL, g=>{
     if(ind.length) feet=ind[ind.length-1].point.y; else if(hs.length) feet=hs[0].point.y; }
   const s=document.getElementById('start');
   s.textContent = touch ? 'Tap to start' : 'Click to start walking';
-}, undefined, e=>{document.getElementById('start').textContent='Could not load model: '+e.message;});
+}, undefined, e=>{document.getElementById('start').textContent='Could not load model: '+e.message; window.arkCheck&&window.arkCheck(true);});
 
 // --- input
 const keys={};
@@ -227,20 +227,21 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
   const ref=seg[3]||'main', pinned=/^[0-9a-f]{40}$/.test(ref);
   const btn=document.getElementById('upd');
   const pos=document.getElementById('pos');
-  async function check(){
+  async function check(force){
     try{
       const r=await fetch('https://api.github.com/repos/'+REPO+'/commits/main',{headers:{Accept:'application/vnd.github.sha'},cache:'no-store'});
       if(!r.ok) return;
       const sha=(await r.text()).trim();
       if(!/^[0-9a-f]{40}$/.test(sha)) return;
       const have=pinned?ref:localStorage.getItem('arkSha');
-      if(sha!==have){
+      if(sha!==have || (force && !pinned)){
         btn.style.display='block';
         btn.onclick=()=>{localStorage.setItem('arkSha',sha);
           location.href='https://raw.githack.com/'+REPO+'/'+sha+'/web/index.html'+location.search;};
       }
     }catch(e){}
   }
+  window.arkCheck=check;
   if(location.hostname.endsWith('githack.com')){check();setInterval(check,120000);}
   const v=document.createElement('div');v.style.cssText='position:fixed;right:8px;bottom:6px;font-size:11px;opacity:.5';
   v.textContent='build '+(pinned?ref.slice(0,7):ref);document.body.appendChild(v);
