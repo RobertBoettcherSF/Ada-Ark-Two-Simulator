@@ -40,28 +40,28 @@
 <div id="hud"><b>Ark Two</b> · <span id="bname">walk-through</span><br>
 <span id="help">W A S D move · mouse look · Shift run · R scale refs · M map · F9 debug · Esc release</span><br>
 <span id="pos"></span><br><span id="fps"></span></div>
-<button id="gear" title="Einstellungen" aria-label="Einstellungen">⚙</button>
+<button id="gear" title="Settings" aria-label="Settings">⚙</button>
 <div id="settings">
-  <h3>Einstellungen</h3>
-  <label for="slBright">Helligkeit allgemein</label>
+  <h3>Settings</h3>
+  <label for="slBright">General brightness</label>
   <input id="slBright" type="range" min="0.3" max="2" step="0.05" value="1">
   <div class="vals" id="vBright">1.00</div>
-  <label for="slBunker">Bunkerbeleuchtung</label>
+  <label for="slBunker">Bunker lighting</label>
   <input id="slBunker" type="range" min="0" max="2" step="0.05" value="1">
   <div class="vals" id="vBunker">1.00</div>
-  <label for="slRes">Auflösung</label>
+  <label for="slRes">Resolution</label>
   <input id="slRes" type="range" min="0.5" max="1" step="0.05" value="1">
   <div class="vals" id="vRes">100 %</div>
-  <button class="close" id="setClose">Schließen</button>
+  <button class="close" id="setClose">Close</button>
 </div>
-<div id="minimapWrap" title="Tippen für große Karte">
+<div id="minimapWrap" title="Tap for full map">
   <canvas id="minimap" width="200" height="200"></canvas>
   <div id="roomLabel">—</div>
 </div>
 <div id="bigMap">
-  <div class="title">Sie sind hier</div>
+  <div class="title">You are here</div>
   <canvas id="bigMapCv" width="900" height="700"></canvas>
-  <div class="hint">M oder Esc zum Schließen · Tippen schließt</div>
+  <div class="hint">M or Esc to close · tap to close</div>
 </div>
 <div id="start">Loading model…</div>
 <div id="stick"><div id="knob"></div></div>
@@ -387,7 +387,7 @@ const startEl=document.getElementById('start');
 startEl.onclick=()=>{
   startEl.style.display='none'; started=true;
   if(touch){document.getElementById('stick').style.display='block';document.getElementById('dbg').style.display='block';
-    document.getElementById('help').textContent='Stick bewegen · rechts schauen · M Karte · Zahnrad Einstellungen · Debug';}
+    document.getElementById('help').textContent='Stick to move · drag right side to look · M map · gear for settings · Debug';}
   else if(!uiBlocked()) renderer.domElement.requestPointerLock();
 };
 renderer.domElement.addEventListener('click',()=>{ if(started&&!touch&&!uiBlocked()) renderer.domElement.requestPointerLock(); });
@@ -465,7 +465,7 @@ function snapshot(){
     camera:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),yaw_deg:+yd.toFixed(1),pitch_deg:+(pitch*57.2958).toFixed(1)},
     looking_at:hit?{object:hit.object.name,distance_m:+hit.distance.toFixed(2)}:null,
     room:currentRoomName||null,
-    brightness:{allgemein:brightGeneral, bunker:bunkerBright}, resolution:resScale,
+    brightness:{general:brightGeneral, bunker:bunkerBright}, resolution:resScale,
     fps:fpsNow, drawCalls:lastCalls,
     note:prompt('Debug note (optional):')||''};
   const stamp=data.time.replace(/[:.]/g,'-');
@@ -499,7 +499,7 @@ function drawMap(ctx, W, H, opts){
   ctx.fillRect(0,0,W,H);
   if(!rooms.length){
     ctx.fillStyle='#888'; ctx.font='12px system-ui'; ctx.textAlign='center';
-    ctx.fillText('Karte lädt…', W/2, H/2); return;
+    ctx.fillText('Map loading…', W/2, H/2); return;
   }
   let cx=centerX, cz=centerZ, meters=viewM||40;
   let pad=16;
