@@ -88,7 +88,8 @@ new GLTFLoader().load(MODEL, g=>{
     if(o.name==='Zone_Interior' || o.parent?.name==='Zone_Interior') return;
     if(o.isLight){ o.intensity = o.isDirectionalLight ? Math.min(o.intensity,3) : Math.min(o.intensity,8); if(o.isDirectionalLight){ sun=o; o.castShadow=true; o.shadow.mapSize.set(2048,2048); const sc=o.shadow.camera; sc.left=sc.bottom=-30; sc.right=sc.top=30; sc.near=0.5; sc.far=200; o.shadow.bias=-0.0005; o.shadow.normalBias=0.03; } else lamps.push(o); o.userData.base=o.intensity; }
     if(o.isMesh){
-      o.castShadow=true; o.receiveShadow=true; walkables.push(o);
+      o.castShadow=true; o.receiveShadow=true;
+      if(/Floor|Ramp|Threshold|Ground_Soil|Apron/.test(o.name)) walkables.push(o);
       if(SKY?.ground && o.material?.name==='Grass_Mound') o.material.color.set(SKY.ground.grass_sunlit);
       if(o.name.startsWith('ScaleRef_')){ o.visible=false; scaleRefs.push(o); return; }
       if(!/Floor|Ramp|Ground_Soil|Apron|Threshold|Bulb|Sign_/.test(o.name)) colliders.push(o);
