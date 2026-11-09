@@ -34,7 +34,7 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
-const MODEL = '../assets/' + (new URLSearchParams(location.search).get('build') || 'ark_two_v005') + '.glb';
+const MODEL = '../assets/' + (new URLSearchParams(location.search).get('build') || 'ark_two_v006') + '.glb';
 const BUILD = MODEL.split('/').pop().replace('.glb','');
 const WALKRE = /(Floor|Threshold)$|^Ground_Soil|^Apron|^AB_Ramp_[AB]$/, OUTDOOR = /^(Ground_Soil|Apron)/;
 const EYE = 1.65, RADIUS = 0.3, WALK = 1.6, RUN = 3.2;
