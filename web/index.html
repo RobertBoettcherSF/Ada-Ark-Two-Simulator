@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Ark Two Simulator</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#111;font-family:system-ui,sans-serif;color:#eee;touch-action:none}
+  canvas{display:block}
+  #hud{position:fixed;left:10px;top:10px;font-size:13px;background:rgba(0,0,0,.55);padding:8px 10px;border-radius:6px;max-width:320px;line-height:1.4}
+  #hud b{color:#f6c64a}
+  #start{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);cursor:pointer;font-size:20px;text-align:center}
+  #toast{position:fixed;right:12px;bottom:12px;background:#2c5a2e;padding:6px 10px;border-radius:6px;display:none}
+  #stick{position:fixed;left:24px;bottom:24px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);display:none}
+  #knob{position:absolute;left:40px;top:40px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.45)}
+  #dbg{position:fixed;right:12px;top:12px;display:none;padding:8px 12px;font-size:14px;border:0;border-radius:6px;background:#444;color:#fff}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+ "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div id="hud"><b>Ark Two</b> · v001 walk-through<br>
+<span id="help">W A S D move · mouse look · Shift run · R scale refs · F9 debug snapshot · Esc release mouse</span><br>
+<span id="pos"></span></div>
+<div id="start">Loading model…</div>
+<div id="stick"><div id="knob"></div></div>
+<button id="dbg">Debug</button>
+<div id="toast"></div>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+
+const MODEL = '../assets/ark_two_v001.glb';
+const EYE = 1.65, RADIUS = 0.3, WALK = 1.6, RUN = 3.2;
+const touch = matchMedia('(pointer: coarse)').matches;
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x9cc3e6);
+scene.add(new THREE.HemisphereLight(0xdfeeff,0x4a5a3a,1.2));
+const camera = new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.05,500);
+camera.rotation.order='YXZ';
+camera.position.set(0,EYE,9);
+
+const colliders=[], scaleRefs=[];
+new GLTFLoader().load(MODEL, g=>{
+  g.scene.traverse(o=>{
+    if(o.isLight){ o.intensity = Math.min(o.intensity, o.isDirectionalLight?3:8); }
+    if(o.isMesh){
+      if(o.name.startsWith('ScaleRef_')){ o.visible=false; scaleRefs.push(o); return; }
+      if(!/Floor|Ground_Soil|Apron|Threshold|Bulb|Sign_/.test(o.name)) colliders.push(o);
+    }
+  });
+  scene.add(g.scene);
+  const s=document.getElementById('start');
+  s.textContent = touch ? 'Tap to start' : 'Click to start walking';
+}, undefined, e=>{document.getElementById('start').textContent='Could not load model: '+e.message;});
+
+// --- input
+const keys={};
+let yaw=0,pitch=0,started=false;
+const startEl=document.getElementById('start');
+startEl.onclick=()=>{
+  startEl.style.display='none'; started=true;
+  if(touch){document.getElementById('stick').style.display='block';document.getElementById('dbg').style.display='block';
+    document.getElementById('help').textContent='Left stick move · drag right side to look · Debug button for snapshot';}
+  else renderer.domElement.requestPointerLock();
+};
+renderer.domElement.addEventListener('click',()=>{ if(started&&!touch) renderer.domElement.requestPointerLock(); });
+addEventListener('mousemove',e=>{ if(document.pointerLockElement){ yaw-=e.movementX*0.0022; pitch-=e.movementY*0.0022; }});
+addEventListener('keydown',e=>{
+  keys[e.code]=true;
+  if(e.code==='F9'){ e.preventDefault(); snapshot(); }
+  if(e.code==='KeyR'){ scaleRefs.forEach(o=>o.visible=!o.visible); toast('Scale refs '+(scaleRefs[0]?.visible?'on':'off')); }
+});
+addEventListener('keyup',e=>keys[e.code]=false);
+
+// touch: stick on left half, look on right half
+let stickId=null,lookId=null,sx=0,sy=0,mx=0,my=0,lx=0,ly=0;
+const knob=document.getElementById('knob');
+addEventListener('touchstart',e=>{ if(!started) return;
+  for(const t of e.changedTouches){
+    if(t.clientX<innerWidth/2 && stickId===null){stickId=t.identifier;sx=t.clientX;sy=t.clientY;}
+    else if(lookId===null){lookId=t.identifier;lx=t.clientX;ly=t.clientY;}
+  }},{passive:true});
+addEventListener('touchmove',e=>{
+  for(const t of e.changedTouches){
+    if(t.identifier===stickId){ mx=Math.max(-1,Math.min(1,(t.clientX-sx)/50)); my=Math.max(-1,Math.min(1,(t.clientY-sy)/50));
+      knob.style.left=(40+mx*40)+'px'; knob.style.top=(40+my*40)+'px'; }
+    if(t.identifier===lookId){ yaw-=(t.clientX-lx)*0.005; pitch-=(t.clientY-ly)*0.005; lx=t.clientX; ly=t.clientY; }
+  }},{passive:true});
+addEventListener('touchend',e=>{
+  for(const t of e.changedTouches){
+    if(t.identifier===stickId){stickId=null;mx=my=0;knob.style.left=knob.style.top='40px';}
+    if(t.identifier===lookId) lookId=null;
+  }});
+document.getElementById('dbg').onclick=snapshot;
+
+// --- movement with wall collision
+const ray=new THREE.Raycaster();
+function blocked(from,dir,dist){
+  for(const h of [0.4,1.2]){
+    ray.set(new THREE.Vector3(from.x,h,from.z),dir); ray.far=dist+RADIUS;
+    if(ray.intersectObjects(colliders,false).length) return true;
+  }
+  return false;
+}
+function move(dt){
+  let f=0,r=0;
+  if(keys.KeyW||keys.ArrowUp) f+=1; if(keys.KeyS||keys.ArrowDown) f-=1;
+  if(keys.KeyD||keys.ArrowRight) r+=1; if(keys.KeyA||keys.ArrowLeft) r-=1;
+  f-=my; r+=mx;
+  if(!f&&!r) return;
+  const sp=(keys.ShiftLeft||keys.ShiftRight)?RUN:WALK;
+  const fw=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)), rt=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+  const v=fw.multiplyScalar(f).add(rt.multiplyScalar(r)); if(v.length()>1) v.normalize();
+  const step=sp*dt;
+  // try X and Z separately so you slide along walls
+  for(const axis of [new THREE.Vector3(Math.sign(v.x),0,0),new THREE.Vector3(0,0,Math.sign(v.z))]){
+    const d=Math.abs(axis.x?v.x:v.z)*step; if(!d) continue;
+    if(!blocked(camera.position,axis,d)) camera.position.addScaledVector(axis,d);
+  }
+}
+
+// --- debug snapshot (F9)
+function snapshot(){
+  const p=camera.position;
+  ray.setFromCamera(new THREE.Vector2(0,0),camera); ray.far=100;
+  const hit=ray.intersectObjects(scene.children,true).find(h=>h.object.visible);
+  const data={build:'ark_two_v001',time:new Date().toISOString(),ua:navigator.userAgent,
+    camera:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),yaw_deg:+(yaw*57.2958).toFixed(1),pitch_deg:+(pitch*57.2958).toFixed(1)},
+    looking_at:hit?{object:hit.object.name,distance_m:+hit.distance.toFixed(2)}:null,
+    note:prompt('Debug note (optional):')||''};
+  const stamp=data.time.replace(/[:.]/g,'-');
+  dl(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),`ark_debug_${stamp}.json`);
+  renderer.render(scene,camera);
+  renderer.domElement.toBlob(b=>dl(b,`ark_debug_${stamp}.png`));
+  toast('Debug snapshot saved to Downloads');
+}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>el.style.display='none',2500);}
+
+// --- loop
+const clock=new THREE.Clock(), posEl=document.getElementById('pos');
+renderer.setAnimationLoop(()=>{
+  const dt=Math.min(clock.getDelta(),0.05);
+  pitch=Math.max(-1.4,Math.min(1.4,pitch));
+  camera.rotation.set(pitch,yaw,0);
+  if(started) move(dt);
+  camera.position.y=EYE;
+  posEl.textContent=`x ${camera.position.x.toFixed(1)}  z ${camera.position.z.toFixed(1)}`;
+  renderer.render(scene,camera);
+});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+</script>
+</body>
+</html>

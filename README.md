@@ -10,5 +10,11 @@ Shown in its ideal, working state.
 - `ada/` simulation logic in Ada (target: WebAssembly)
 - `data/` JSON: rooms, suites A-G, archive entries
 
+## Try it
+https://raw.githack.com/RobertBoettcherSF/Ada-Ark-Two-Simulator/main/web/index.html
+
+Computer: click, then W A S D + mouse, Shift to run, R toggles scale references, F9 saves a debug snapshot (JSON + PNG) to Downloads.
+Phone: left thumb stick to move, drag on the right to look, Debug button for a snapshot.
+
 ## Content policy
 Only our own models, code, data and cleared music live here. No third-party footage, screenshots or scans.
