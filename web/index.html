@@ -182,7 +182,7 @@ function snapshot(){
   const p=camera.position;
   ray.setFromCamera(new THREE.Vector2(0,0),camera); ray.far=100;
   const hit=ray.intersectObjects(scene.children,true).find(h=>h.object.visible);
-  const data={build:'ark_two_v001',time:new Date().toISOString(),ua:navigator.userAgent,
+  const data={build:BUILD,commit:(location.pathname.split('/')[3]||'main'),time:new Date().toISOString(),ua:navigator.userAgent,
     camera:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3),yaw_deg:+(yaw*57.2958).toFixed(1),pitch_deg:+(pitch*57.2958).toFixed(1)},
     looking_at:hit?{object:hit.object.name,distance_m:+hit.distance.toFixed(2)}:null,
     note:prompt('Debug note (optional):')||''};
