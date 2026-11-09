@@ -39,12 +39,12 @@ const touch = matchMedia('(pointer: coarse)').matches;
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.5;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x9cc3e6);
-scene.add(new THREE.HemisphereLight(0xdfeeff,0x4a5a3a,1.2));
+scene.add(new THREE.HemisphereLight(0xdfeeff,0x4a5a3a,1.8));
 const camera = new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.05,500);
 camera.rotation.order='YXZ';
 camera.position.set(0,EYE,9);
