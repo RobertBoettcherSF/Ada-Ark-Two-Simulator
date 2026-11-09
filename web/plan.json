@@ -1,0 +1,2152 @@
+{
+ "version": "v008",
+ "units": "m",
+ "coords": "page ?pos: x = Blender x, z = -Blender y; floor_y = Blender z of the floor top",
+ "source": "website-plan.gif traced at 0.075 m/px; plan south = Blender -X, plan east = Blender -Y: Blender X = -13.350 - (py - 308) * 0.075, Blender Y = 29.000 - (px - 137.5) * 0.075 (Reception Area column = the caged Entrance area bus)",
+ "rooms": [
+  {
+   "name": "Women's Separate Area",
+   "kind": "area",
+   "polygon": [
+    [
+     -38.338,
+     -31.663
+    ],
+    [
+     -38.338,
+     -12.463
+    ],
+    [
+     -40.638,
+     -12.463
+    ],
+    [
+     -40.638,
+     -31.663
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": -29.0,
+     "to": "Roller Track Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -38.268,
+     "z": -25.475,
+     "to": "Future Surgery",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -38.268,
+     "z": -19.55,
+     "to": "Adult Women Bunk Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -38.268,
+     "z": -16.25,
+     "to": "Women's Washroom",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -40.708,
+     "z": -29.0,
+     "to": "Storage Room with Steel Grate Door",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -40.708,
+     "z": -25.625,
+     "to": "Teenage Girls Day Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -40.708,
+     "z": -18.95,
+     "to": "Young Girls Day Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -40.708,
+     "z": -12.65,
+     "to": "Adult Day Room with Caged Pharmacy",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08
+  },
+  {
+   "name": "General Hallway & Sitting Area",
+   "kind": "hallway",
+   "polygon": [
+    [
+     -38.338,
+     -12.463
+    ],
+    [
+     -38.338,
+     16.412
+    ],
+    [
+     -40.638,
+     16.412
+    ],
+    [
+     -40.638,
+     -12.463
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": -1.25,
+     "to": "Computer Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -38.268,
+     "z": 1.9,
+     "to": "Young Boys Day Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -38.268,
+     "z": 8.5,
+     "to": "Tool Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -38.268,
+     "z": 11.65,
+     "to": "Dish Sink Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -38.268,
+     "z": 15.025,
+     "to": "Kitchen",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -40.708,
+     "z": -2.075,
+     "to": "Teenage Boys Bunk Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -40.708,
+     "z": 1.375,
+     "to": "Broadcast Electronics Room / Chapel",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -40.708,
+     "z": 4.75,
+     "to": "Transmitter Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -40.708,
+     "z": 8.125,
+     "to": "Storage Room with Steel Grill",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -40.708,
+     "z": 14.8,
+     "to": "Laundry Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -38.031,
+     "z": -6.913,
+     "to": "Generators",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08
+  },
+  {
+   "name": "General Hallway & Sitting Area (north spur)",
+   "kind": "hallway",
+   "polygon": [
+    [
+     -38.338,
+     -10.875
+    ],
+    [
+     -38.338,
+     -8.575
+    ],
+    [
+     -12.75,
+     -8.575
+    ],
+    [
+     -12.75,
+     -10.875
+    ]
+   ],
+   "doors": [
+    {
+     "x": -14.738,
+     "z": -10.945,
+     "to": "X-Ray & Dentist Chair",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -18.263,
+     "z": -10.945,
+     "to": "Nursery with Cry Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -21.713,
+     "z": -10.945,
+     "to": "Silent Library",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -17.363,
+     "z": -8.505,
+     "to": "Children's Playroom",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -20.513,
+     "z": -8.505,
+     "to": "Conference Room",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -26.963,
+     "z": -11.375,
+     "to": "Men's Washroom",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -26.475,
+     "z": -8.269,
+     "to": "Generators",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08
+  },
+  {
+   "name": "Reception Area",
+   "kind": "room",
+   "id": "N01",
+   "polygon": [
+    [
+     -13.35,
+     -27.85
+    ],
+    [
+     -13.35,
+     -30.15
+    ],
+    [
+     -25.55,
+     -30.15
+    ],
+    [
+     -25.55,
+     -27.85
+    ]
+   ],
+   "doors": [
+    {
+     "x": -25.55,
+     "z": -29.0,
+     "to": "Roller Track Room",
+     "kind": "red-framed end door (in line)",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -13.35,
+     "z": -29.0,
+     "to": "Entrance Tunnel",
+     "kind": "red grate door",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -15.675,
+     "z": -27.275,
+     "to": "Decontamination",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    119,
+    308,
+    156,
+    467
+   ],
+   "pos": "-13.65,-29.0,90.0"
+  },
+  {
+   "name": "Roller Track Room",
+   "kind": "room",
+   "id": "N03",
+   "polygon": [
+    [
+     -38.288,
+     -30.15
+    ],
+    [
+     -38.288,
+     -27.85
+    ],
+    [
+     -25.58,
+     -27.85
+    ],
+    [
+     -25.58,
+     -30.15
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": -29.0,
+     "to": "Women's Separate Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -25.55,
+     "z": -29.0,
+     "to": "Reception Area",
+     "kind": "red-framed end door (in line)",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    119,
+    474,
+    156,
+    633
+   ],
+   "pos": "-39.488,-29.0,-90.0"
+  },
+  {
+   "name": "Future Surgery",
+   "kind": "room",
+   "id": "N04",
+   "polygon": [
+    [
+     -38.288,
+     -26.625
+    ],
+    [
+     -38.288,
+     -24.325
+    ],
+    [
+     -25.875,
+     -24.325
+    ],
+    [
+     -25.875,
+     -26.625
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": -25.475,
+     "to": "Women's Separate Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -25.575,
+     "z": -25.513,
+     "to": "Decontamination",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    166,
+    475,
+    203,
+    634
+   ],
+   "pos": "-39.488,-25.475,-90.0"
+  },
+  {
+   "name": "Adult Women Bunk Room",
+   "kind": "room",
+   "id": "N05",
+   "polygon": [
+    [
+     -38.288,
+     -20.7
+    ],
+    [
+     -38.288,
+     -18.4
+    ],
+    [
+     -25.5,
+     -18.4
+    ],
+    [
+     -25.5,
+     -20.7
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": -19.55,
+     "to": "Women's Separate Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    245,
+    470,
+    282,
+    629
+   ],
+   "pos": "-39.488,-19.55,-90.0"
+  },
+  {
+   "name": "Women's Washroom",
+   "kind": "room",
+   "id": "N06",
+   "polygon": [
+    [
+     -38.288,
+     -17.4
+    ],
+    [
+     -38.288,
+     -15.1
+    ],
+    [
+     -25.5,
+     -15.1
+    ],
+    [
+     -25.5,
+     -17.4
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": -16.25,
+     "to": "Women's Separate Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    289,
+    470,
+    326,
+    628
+   ],
+   "pos": "-39.488,-16.25,-90.0"
+  },
+  {
+   "name": "Computer Room",
+   "kind": "room",
+   "id": "N07",
+   "polygon": [
+    [
+     -38.288,
+     -2.4
+    ],
+    [
+     -38.288,
+     -0.1
+    ],
+    [
+     -25.725,
+     -0.1
+    ],
+    [
+     -25.725,
+     -2.4
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": -1.25,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -25.364,
+     "z": -1.25,
+     "to": "Command Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [
+    {
+     "name": "Office",
+     "partition_page": [
+      -28.2,
+      -1.25
+     ],
+     "length_m": 2.47
+    }
+   ],
+   "plan_px_rect": [
+    489,
+    473,
+    526,
+    632
+   ],
+   "pos": "-39.488,-1.25,-90.0"
+  },
+  {
+   "name": "Young Boys Day Room",
+   "kind": "room",
+   "id": "N08",
+   "polygon": [
+    [
+     -38.288,
+     0.75
+    ],
+    [
+     -38.288,
+     3.05
+    ],
+    [
+     -25.725,
+     3.05
+    ],
+    [
+     -25.725,
+     0.75
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": 1.9,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -36.75,
+     "z": 3.587,
+     "to": "Young Boys Bunk Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    531,
+    473,
+    568,
+    632
+   ],
+   "pos": "-39.488,1.9,-90.0"
+  },
+  {
+   "name": "Tool Room",
+   "kind": "room",
+   "id": "N09",
+   "polygon": [
+    [
+     -38.288,
+     7.35
+    ],
+    [
+     -38.288,
+     9.65
+    ],
+    [
+     -25.725,
+     9.65
+    ],
+    [
+     -25.725,
+     7.35
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": 8.5,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [
+    {
+     "name": "Engineers Quarters",
+     "partition_page": [
+      -28.325,
+      8.5
+     ],
+     "length_m": 2.6
+    }
+   ],
+   "plan_px_rect": [
+    619,
+    473,
+    656,
+    632
+   ],
+   "pos": "-39.488,8.5,-90.0"
+  },
+  {
+   "name": "Dish Sink Room",
+   "kind": "room",
+   "id": "N10",
+   "polygon": [
+    [
+     -38.288,
+     10.5
+    ],
+    [
+     -38.288,
+     12.8
+    ],
+    [
+     -25.725,
+     12.8
+    ],
+    [
+     -25.725,
+     10.5
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": 11.65,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    661,
+    473,
+    698,
+    632
+   ],
+   "pos": "-39.488,11.65,-90.0"
+  },
+  {
+   "name": "Kitchen",
+   "kind": "room",
+   "id": "N11",
+   "polygon": [
+    [
+     -38.288,
+     13.875
+    ],
+    [
+     -38.288,
+     16.175
+    ],
+    [
+     -25.8,
+     16.175
+    ],
+    [
+     -25.8,
+     13.875
+    ]
+   ],
+   "doors": [
+    {
+     "x": -38.268,
+     "z": 15.025,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    706,
+    474,
+    743,
+    633
+   ],
+   "pos": "-39.488,15.025,-90.0"
+  },
+  {
+   "name": "Storage Room with Steel Grate Door",
+   "kind": "room",
+   "id": "S01",
+   "polygon": [
+    [
+     -40.688,
+     -27.85
+    ],
+    [
+     -40.688,
+     -30.15
+    ],
+    [
+     -53.25,
+     -30.15
+    ],
+    [
+     -53.25,
+     -27.85
+    ]
+   ],
+   "doors": [
+    {
+     "x": -40.708,
+     "z": -29.0,
+     "to": "Women's Separate Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    119,
+    681,
+    156,
+    840
+   ],
+   "pos": "-39.488,-29.0,90.0"
+  },
+  {
+   "name": "Teenage Girls Day Room",
+   "kind": "room",
+   "id": "S02",
+   "polygon": [
+    [
+     -40.688,
+     -24.475
+    ],
+    [
+     -40.688,
+     -26.775
+    ],
+    [
+     -53.25,
+     -26.775
+    ],
+    [
+     -53.25,
+     -24.475
+    ]
+   ],
+   "doors": [
+    {
+     "x": -40.708,
+     "z": -25.625,
+     "to": "Women's Separate Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -42.225,
+     "z": -23.975,
+     "to": "Teenage Girls Bunk Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    164,
+    681,
+    201,
+    840
+   ],
+   "pos": "-39.488,-25.625,90.0"
+  },
+  {
+   "name": "Young Girls Day Room",
+   "kind": "room",
+   "id": "S03",
+   "polygon": [
+    [
+     -40.688,
+     -17.8
+    ],
+    [
+     -40.688,
+     -20.1
+    ],
+    [
+     -53.25,
+     -20.1
+    ],
+    [
+     -53.25,
+     -17.8
+    ]
+   ],
+   "doors": [
+    {
+     "x": -40.708,
+     "z": -18.95,
+     "to": "Women's Separate Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -42.225,
+     "z": -17.375,
+     "to": "Young Girls Bunk Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    253,
+    681,
+    290,
+    840
+   ],
+   "pos": "-39.488,-18.95,90.0"
+  },
+  {
+   "name": "Adult Day Room with Caged Pharmacy",
+   "kind": "room",
+   "id": "S04",
+   "polygon": [
+    [
+     -40.688,
+     -11.5
+    ],
+    [
+     -40.688,
+     -13.8
+    ],
+    [
+     -53.25,
+     -13.8
+    ],
+    [
+     -53.25,
+     -11.5
+    ]
+   ],
+   "doors": [
+    {
+     "x": -40.708,
+     "z": -12.65,
+     "to": "Women's Separate Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -42.188,
+     "z": -11.113,
+     "to": "Adult Men Bunk Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [
+    {
+     "name": "Caged Pharmacy",
+     "partition_page": [
+      -49.75,
+      -12.65
+     ],
+     "length_m": 3.5
+    }
+   ],
+   "plan_px_rect": [
+    337,
+    681,
+    374,
+    840
+   ],
+   "pos": "-39.488,-12.65,90.0"
+  },
+  {
+   "name": "Teenage Boys Bunk Room",
+   "kind": "room",
+   "id": "S05",
+   "polygon": [
+    [
+     -40.688,
+     -0.925
+    ],
+    [
+     -40.688,
+     -3.225
+    ],
+    [
+     -53.4,
+     -3.225
+    ],
+    [
+     -53.4,
+     -0.925
+    ]
+   ],
+   "doors": [
+    {
+     "x": -40.708,
+     "z": -2.075,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -42.263,
+     "z": -3.8,
+     "to": "Teenage Boys Day Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    478,
+    683,
+    515,
+    842
+   ],
+   "pos": "-39.488,-2.075,90.0"
+  },
+  {
+   "name": "Broadcast Electronics Room / Chapel",
+   "kind": "room",
+   "id": "S06",
+   "polygon": [
+    [
+     -40.688,
+     2.525
+    ],
+    [
+     -40.688,
+     0.225
+    ],
+    [
+     -53.4,
+     0.225
+    ],
+    [
+     -53.4,
+     2.525
+    ]
+   ],
+   "doors": [
+    {
+     "x": -40.708,
+     "z": 1.375,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [
+    {
+     "name": "Chapel",
+     "partition_page": [
+      -50.4,
+      1.375
+     ],
+     "length_m": 3.0
+    }
+   ],
+   "plan_px_rect": [
+    524,
+    683,
+    561,
+    842
+   ],
+   "pos": "-39.488,1.375,90.0"
+  },
+  {
+   "name": "Transmitter Room",
+   "kind": "room",
+   "id": "S07",
+   "polygon": [
+    [
+     -40.688,
+     5.9
+    ],
+    [
+     -40.688,
+     3.6
+    ],
+    [
+     -53.4,
+     3.6
+    ],
+    [
+     -53.4,
+     5.9
+    ]
+   ],
+   "doors": [
+    {
+     "x": -40.708,
+     "z": 4.75,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    569,
+    683,
+    606,
+    842
+   ],
+   "pos": "-39.488,4.75,90.0"
+  },
+  {
+   "name": "Storage Room with Steel Grill",
+   "kind": "room",
+   "id": "S08",
+   "polygon": [
+    [
+     -40.688,
+     9.275
+    ],
+    [
+     -40.688,
+     6.975
+    ],
+    [
+     -53.475,
+     6.975
+    ],
+    [
+     -53.475,
+     9.275
+    ]
+   ],
+   "doors": [
+    {
+     "x": -40.708,
+     "z": 8.125,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -52.425,
+     "z": 9.812,
+     "to": "5,000 Gallon Water Tank Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    614,
+    682,
+    651,
+    843
+   ],
+   "pos": "-39.488,8.125,90.0"
+  },
+  {
+   "name": "Laundry Room",
+   "kind": "room",
+   "id": "S09",
+   "polygon": [
+    [
+     -40.688,
+     15.95
+    ],
+    [
+     -40.688,
+     13.65
+    ],
+    [
+     -53.325,
+     13.65
+    ],
+    [
+     -53.325,
+     15.95
+    ]
+   ],
+   "doors": [
+    {
+     "x": -40.708,
+     "z": 14.8,
+     "to": "General Hallway & Sitting Area",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    703,
+    682,
+    740,
+    841
+   ],
+   "pos": "-39.488,14.8,90.0"
+  },
+  {
+   "name": "Men's Washroom",
+   "kind": "room",
+   "id": "N12",
+   "polygon": [
+    [
+     -37.2,
+     -14.175
+    ],
+    [
+     -37.2,
+     -11.875
+    ],
+    [
+     -25.5,
+     -11.875
+    ],
+    [
+     -25.5,
+     -14.175
+    ]
+   ],
+   "doors": [
+    {
+     "x": -26.963,
+     "z": -11.375,
+     "to": "General Hallway & Sitting Area (north spur)",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    332,
+    470,
+    369,
+    626
+   ],
+   "pos": "-36.75,-13.025,-90.0"
+  },
+  {
+   "name": "Young Boys Bunk Room",
+   "kind": "room",
+   "id": "N13",
+   "polygon": [
+    [
+     -37.65,
+     4.125
+    ],
+    [
+     -37.65,
+     6.425
+    ],
+    [
+     -25.725,
+     6.425
+    ],
+    [
+     -25.725,
+     4.125
+    ]
+   ],
+   "doors": [
+    {
+     "x": -36.75,
+     "z": 3.587,
+     "to": "Young Boys Day Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    576,
+    473,
+    613,
+    632
+   ],
+   "pos": "-37.2,5.275,-90.0"
+  },
+  {
+   "name": "Teenage Girls Bunk Room",
+   "kind": "room",
+   "id": "S10",
+   "polygon": [
+    [
+     -41.325,
+     -21.175
+    ],
+    [
+     -41.325,
+     -23.475
+    ],
+    [
+     -53.25,
+     -23.475
+    ],
+    [
+     -53.25,
+     -21.175
+    ]
+   ],
+   "doors": [
+    {
+     "x": -42.225,
+     "z": -23.975,
+     "to": "Teenage Girls Day Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    208,
+    681,
+    245,
+    840
+   ],
+   "pos": "-41.775,-22.325,90.0"
+  },
+  {
+   "name": "Young Girls Bunk Room",
+   "kind": "room",
+   "id": "S11",
+   "polygon": [
+    [
+     -41.325,
+     -14.65
+    ],
+    [
+     -41.325,
+     -16.95
+    ],
+    [
+     -53.25,
+     -16.95
+    ],
+    [
+     -53.25,
+     -14.65
+    ]
+   ],
+   "doors": [
+    {
+     "x": -42.225,
+     "z": -17.375,
+     "to": "Young Girls Day Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    295,
+    681,
+    332,
+    840
+   ],
+   "pos": "-41.775,-15.8,90.0"
+  },
+  {
+   "name": "Adult Men Bunk Room",
+   "kind": "room",
+   "id": "S12",
+   "polygon": [
+    [
+     -41.325,
+     -8.425
+    ],
+    [
+     -41.325,
+     -10.725
+    ],
+    [
+     -53.25,
+     -10.725
+    ],
+    [
+     -53.25,
+     -8.425
+    ]
+   ],
+   "doors": [
+    {
+     "x": -42.188,
+     "z": -11.113,
+     "to": "Adult Day Room with Caged Pharmacy",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    378,
+    681,
+    415,
+    840
+   ],
+   "pos": "-41.775,-9.575,90.0"
+  },
+  {
+   "name": "Teenage Boys Day Room",
+   "kind": "room",
+   "id": "S13",
+   "polygon": [
+    [
+     -41.475,
+     -4.375
+    ],
+    [
+     -41.475,
+     -6.675
+    ],
+    [
+     -53.4,
+     -6.675
+    ],
+    [
+     -53.4,
+     -4.375
+    ]
+   ],
+   "doors": [
+    {
+     "x": -42.263,
+     "z": -3.8,
+     "to": "Teenage Boys Bunk Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    432,
+    683,
+    469,
+    842
+   ],
+   "pos": "-41.925,-5.525,90.0"
+  },
+  {
+   "name": "5,000 Gallon Water Tank Room",
+   "kind": "room",
+   "id": "S14",
+   "polygon": [
+    [
+     -41.4,
+     12.65
+    ],
+    [
+     -41.4,
+     10.35
+    ],
+    [
+     -53.325,
+     10.35
+    ],
+    [
+     -53.325,
+     12.65
+    ]
+   ],
+   "doors": [
+    {
+     "x": -52.425,
+     "z": 9.812,
+     "to": "Storage Room with Steel Grill",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    657,
+    682,
+    698,
+    841
+   ],
+   "pos": "-50.175,11.5,90.0"
+  },
+  {
+   "name": "X-Ray & Dentist Chair",
+   "kind": "room",
+   "id": "W01",
+   "polygon": [
+    [
+     -15.888,
+     -10.925
+    ],
+    [
+     -13.588,
+     -10.925
+    ],
+    [
+     -13.588,
+     -23.488
+    ],
+    [
+     -15.888,
+     -23.488
+    ]
+   ],
+   "doors": [
+    {
+     "x": -14.738,
+     "z": -10.945,
+     "to": "General Hallway & Sitting Area (north spur)",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -14.85,
+     "z": -23.924,
+     "to": "Decontamination",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    211,
+    308,
+    370,
+    345
+   ],
+   "pos": "-14.738,-9.725,0.0"
+  },
+  {
+   "name": "Nursery with Cry Room",
+   "kind": "room",
+   "id": "W02",
+   "polygon": [
+    [
+     -19.413,
+     -10.925
+    ],
+    [
+     -17.113,
+     -10.925
+    ],
+    [
+     -17.112,
+     -23.337
+    ],
+    [
+     -19.412,
+     -23.337
+    ]
+   ],
+   "doors": [
+    {
+     "x": -18.263,
+     "z": -10.945,
+     "to": "General Hallway & Sitting Area (north spur)",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [
+    {
+     "name": "Cry Room",
+     "partition_page": [
+      -18.263,
+      -18.163
+     ],
+     "length_m": 5.18
+    }
+   ],
+   "plan_px_rect": [
+    213,
+    355,
+    372,
+    392
+   ],
+   "pos": "-18.263,-9.725,0.0"
+  },
+  {
+   "name": "Silent Library",
+   "kind": "room",
+   "id": "W03",
+   "polygon": [
+    [
+     -22.863,
+     -10.925
+    ],
+    [
+     -20.563,
+     -10.925
+    ],
+    [
+     -20.562,
+     -23.262
+    ],
+    [
+     -22.862,
+     -23.263
+    ]
+   ],
+   "doors": [
+    {
+     "x": -21.713,
+     "z": -10.945,
+     "to": "General Hallway & Sitting Area (north spur)",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    214,
+    401,
+    373,
+    438
+   ],
+   "pos": "-21.713,-9.725,0.0"
+  },
+  {
+   "name": "Children's Playroom",
+   "kind": "room",
+   "id": "E01",
+   "polygon": [
+    [
+     -16.213,
+     -8.525
+    ],
+    [
+     -18.513,
+     -8.525
+    ],
+    [
+     -18.513,
+     4.037
+    ],
+    [
+     -16.213,
+     4.037
+    ]
+   ],
+   "doors": [
+    {
+     "x": -17.363,
+     "z": -8.505,
+     "to": "General Hallway & Sitting Area (north spur)",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -15.75,
+     "z": -6.988,
+     "to": "Bunk Room for 90 Small Children",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    420,
+    343,
+    578,
+    380
+   ],
+   "pos": "-17.363,-9.725,180.0"
+  },
+  {
+   "name": "Conference Room",
+   "kind": "room",
+   "id": "E02",
+   "polygon": [
+    [
+     -19.363,
+     -8.525
+    ],
+    [
+     -21.663,
+     -8.525
+    ],
+    [
+     -21.663,
+     4.112
+    ],
+    [
+     -19.363,
+     4.113
+    ]
+   ],
+   "doors": [
+    {
+     "x": -20.513,
+     "z": -8.505,
+     "to": "General Hallway & Sitting Area (north spur)",
+     "kind": "hallway door, sunken threshold",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -22.163,
+     "z": -7.025,
+     "to": "Command Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [
+    {
+     "name": "Bed Room",
+     "partition_page": [
+      -20.513,
+      1.187
+     ],
+     "length_m": 2.92
+    }
+   ],
+   "plan_px_rect": [
+    420,
+    385,
+    579,
+    422
+   ],
+   "pos": "-20.513,-9.725,180.0"
+  },
+  {
+   "name": "Bunk Room for 90 Small Children",
+   "kind": "room",
+   "id": "E03",
+   "polygon": [
+    [
+     -12.988,
+     -7.963
+    ],
+    [
+     -15.288,
+     -7.963
+    ],
+    [
+     -15.288,
+     3.962
+    ],
+    [
+     -12.988,
+     3.962
+    ]
+   ],
+   "doors": [
+    {
+     "x": -15.75,
+     "z": -6.988,
+     "to": "Children's Playroom",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    418,
+    300,
+    577,
+    337
+   ],
+   "pos": "-14.138,-7.512,180.0"
+  },
+  {
+   "name": "Command Room",
+   "kind": "room",
+   "id": "E04",
+   "polygon": [
+    [
+     -22.663,
+     -7.813
+    ],
+    [
+     -24.963,
+     -7.813
+    ],
+    [
+     -24.963,
+     4.187
+    ],
+    [
+     -22.663,
+     4.188
+    ]
+   ],
+   "doors": [
+    {
+     "x": -25.364,
+     "z": -1.25,
+     "to": "Computer Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -22.163,
+     "z": -7.025,
+     "to": "Conference Room",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [
+    {
+     "name": "Wash Room",
+     "partition_page": [
+      -23.813,
+      1.187
+     ],
+     "length_m": 3.0
+    }
+   ],
+   "plan_px_rect": [
+    420,
+    429,
+    580,
+    466
+   ],
+   "pos": "-23.813,-7.363,180.0"
+  },
+  {
+   "name": "Decontamination",
+   "kind": "room",
+   "id": "N02",
+   "polygon": [
+    [
+     -13.35,
+     -24.4
+    ],
+    [
+     -13.35,
+     -26.7
+    ],
+    [
+     -25.275,
+     -26.7
+    ],
+    [
+     -25.275,
+     -24.4
+    ]
+   ],
+   "doors": [
+    {
+     "x": -15.675,
+     "z": -27.275,
+     "to": "Reception Area",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -25.575,
+     "z": -25.513,
+     "to": "Future Surgery",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -14.85,
+     "z": -23.924,
+     "to": "X-Ray & Dentist Chair",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    165,
+    308,
+    202,
+    467
+   ],
+   "pos": "-13.8,-25.55,90.0"
+  },
+  {
+   "name": "Generators",
+   "kind": "room",
+   "id": "N14",
+   "polygon": [
+    [
+     -25.2,
+     -2.638
+    ],
+    [
+     -25.2,
+     -7.963
+    ],
+    [
+     -37.725,
+     -7.963
+    ],
+    [
+     -37.725,
+     -2.638
+    ]
+   ],
+   "doors": [
+    {
+     "x": -26.475,
+     "z": -8.269,
+     "to": "General Hallway & Sitting Area (north spur)",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    },
+    {
+     "x": -38.031,
+     "z": -6.913,
+     "to": "General Hallway & Sitting Area",
+     "kind": "passage",
+     "w": 0.9,
+     "h": 2.04
+    }
+   ],
+   "floor_y": -7.08,
+   "subrooms": [],
+   "plan_px_rect": [
+    418,
+    466,
+    489,
+    633
+   ],
+   "pos": "-25.7,-5.3,0"
+  }
+ ],
+ "entrance": [
+  {
+   "name": "Main Entrance (top landing)",
+   "segment": "TopLanding",
+   "polygon": [
+    [
+     -1.15,
+     -0.0
+    ],
+    [
+     1.15,
+     -0.0
+    ],
+    [
+     1.15,
+     -3.0
+    ],
+    [
+     -1.15,
+     -3.0
+    ]
+   ],
+   "floor_y": [
+    0.0,
+    0.02
+   ]
+  },
+  {
+   "name": "Conveyors to 20 feet below grade (ramp)",
+   "segment": "RampBus1",
+   "polygon": [
+    [
+     -1.15,
+     -3.0
+    ],
+    [
+     1.15,
+     -3.0
+    ],
+    [
+     1.15,
+     -15.2
+    ],
+    [
+     -1.15,
+     -15.2
+    ]
+   ],
+   "floor_y": [
+    -3.05,
+    0.02
+   ]
+  },
+  {
+   "name": "Conveyors to 20 feet below grade (ramp)",
+   "segment": "RampBus2",
+   "polygon": [
+    [
+     -1.15,
+     -15.2
+    ],
+    [
+     1.15,
+     -15.2
+    ],
+    [
+     1.15,
+     -27.4
+    ],
+    [
+     -1.15,
+     -27.4
+    ]
+   ],
+   "floor_y": [
+    -6.1,
+    -3.03
+   ]
+  },
+  {
+   "name": "Bottom landing",
+   "segment": "BottomLanding",
+   "polygon": [
+    [
+     -1.15,
+     -27.4
+    ],
+    [
+     1.15,
+     -27.4
+    ],
+    [
+     1.15,
+     -30.2
+    ],
+    [
+     -1.15,
+     -30.2
+    ]
+   ],
+   "floor_y": [
+    -6.1,
+    -6.08
+   ]
+  },
+  {
+   "name": "Entrance Tunnel",
+   "segment": "EntranceTunnel_Top",
+   "polygon": [
+    [
+     -0.0,
+     -27.85
+    ],
+    [
+     0.0,
+     -30.15
+    ],
+    [
+     -1.75,
+     -30.15
+    ],
+    [
+     -1.75,
+     -27.85
+    ]
+   ],
+   "floor_y": [
+    -6.1,
+    -6.08
+   ]
+  },
+  {
+   "name": "Entrance Tunnel",
+   "segment": "EntranceTunnel_Ramp",
+   "polygon": [
+    [
+     -1.75,
+     -27.85
+    ],
+    [
+     -1.75,
+     -30.15
+    ],
+    [
+     -5.75,
+     -30.15
+    ],
+    [
+     -5.75,
+     -27.85
+    ]
+   ],
+   "floor_y": [
+    -7.1,
+    -6.08
+   ]
+  },
+  {
+   "name": "Entrance Tunnel",
+   "segment": "EntranceTunnel_Lower",
+   "polygon": [
+    [
+     -5.75,
+     -27.85
+    ],
+    [
+     -5.75,
+     -30.15
+    ],
+    [
+     -13.35,
+     -30.15
+    ],
+    [
+     -13.35,
+     -27.85
+    ]
+   ],
+   "floor_y": [
+    -7.1,
+    -7.08
+   ]
+  }
+ ]
+}

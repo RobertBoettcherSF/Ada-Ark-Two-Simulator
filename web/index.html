@@ -73,7 +73,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 
-const MODEL = '../assets/' + (new URLSearchParams(location.search).get('build') || 'ark_two_v007') + '.glb';
+const MODEL = '../assets/' + (new URLSearchParams(location.search).get('build') || 'ark_two_v008') + '.glb';
 const BUILD = MODEL.split('/').pop().replace('.glb','');
 const WALKRE = /(Floor|Threshold)$|^Ground_Soil|^Apron|^AB_Ramp_[AB]$/, OUTDOOR = /^(Ground_Soil|Apron)/;
 const EYE = 1.65, RADIUS = 0.3, WALK = 1.6, RUN = 3.2;
@@ -183,6 +183,7 @@ async function tryPlanJson(){
     const r=await fetch('plan.json',{cache:'no-store'});
     if(!r.ok) return null;
     const j=await r.json();
+    if(j.version && j.version!==BUILD.replace('ark_two_','')) return null; // plan belongs to another build
     const list=Array.isArray(j)?j:(j.rooms||null);
     if(!Array.isArray(list)||!list.length) return null;
     const out=[];
@@ -298,11 +299,14 @@ const onModel = g=>{
         lampData.push({name:o.name, pos, color:o.color.clone(), intensity:o.intensity, distance:o.distance, decay:o.decay, bunker:true}); glbLights.push(o); } }
     if(o.isMesh){
       o.castShadow=false; o.receiveShadow=false;
-      if(o.material?.name==='Mat_Bunker_Strip' && !stripMats.has(o.material)){ o.material.userData.baseEmissive=o.material.emissiveIntensity; stripMats.add(o.material); }
-      if(WALKRE.test(o.name)) walkables.push(o);
+      if(/^(Mat_Bunker_Strip|Light_Bunker_Emissive)$/.test(o.material?.name||'') && !stripMats.has(o.material)){ o.material.userData.baseEmissive=o.material.emissiveIntensity; stripMats.add(o.material); }
+      const par=o.parent&&o.parent.isGroup?o.parent:null; // multi-material nodes load as Group + child meshes
+      const walk=WALKRE.test(o.name)||o.userData.walkable===true||(par&&(WALKRE.test(par.name)||par.userData.walkable===true));
+      if(walk&&par&&!WALKRE.test(o.name)) o.name=par.name+'_'+o.name.replace(par.name,'').replace(/^_/,'')+'Floor';
+      if(walk) walkables.push(o);
       if(SKY?.ground && o.material?.name==='Grass_Mound') o.material.color.set(SKY.ground.grass_sunlit);
       if(o.name.startsWith('ScaleRef_')){ o.visible=false; scaleRefs.push(o); return; }
-      if(!WALKRE.test(o.name) && !/Bulb|Sign_/.test(o.name)) colliders.push(o);
+      if(!walk && !/Bulb|Sign_|^Light_/.test(o.name) && !/Bulb|Sign_|^Light_/.test(par?.name||'')) colliders.push(o);
     }
   });
   // drop glb point/spot lights (children re-attached to keep their world place)
