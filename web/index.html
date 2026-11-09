@@ -242,8 +242,12 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
       const have=pinned?ref:localStorage.getItem('arkSha');
       if(sha!==have || (force && !pinned)){
         btn.style.display='block';
-        btn.onclick=()=>{localStorage.setItem('arkSha',sha);
-          location.href='https://raw.githack.com/'+REPO+'/'+sha+'/web/index.html'+location.search;};
+        btn.onclick=async()=>{ // re-ask on tap so a button shown earlier never sends you to an outdated build
+          let to=sha; btn.textContent='Loading newest version…';
+          try{ const r2=await fetch('https://api.github.com/repos/'+REPO+'/commits/main?t='+Date.now(),{headers:{Accept:'application/vnd.github.sha'},cache:'no-store'});
+               const s2=r2.ok?(await r2.text()).trim():''; if(/^[0-9a-f]{40}$/.test(s2)) to=s2; }catch(e){}
+          localStorage.setItem('arkSha',to);
+          location.href='https://raw.githack.com/'+REPO+'/'+to+'/web/index.html'+location.search;};
       }
     }catch(e){}
   }
