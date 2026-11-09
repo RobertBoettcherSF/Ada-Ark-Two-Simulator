@@ -1,0 +1,6 @@
+obj/
+bin/
+*.ali
+*.o
+alire/
+.DS_Store
