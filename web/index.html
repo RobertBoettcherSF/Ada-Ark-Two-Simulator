@@ -44,8 +44,8 @@
 <div id="settings">
   <h3>Settings</h3>
   <label for="slBright">General brightness</label>
-  <input id="slBright" type="range" min="0.3" max="2" step="0.05" value="1">
-  <div class="vals" id="vBright">1.00</div>
+  <input id="slBright" type="range" min="0.3" max="2" step="0.05" value="1.35">
+  <div class="vals" id="vBright">1.35</div>
   <label for="slBunker">Bunker lighting</label>
   <input id="slBunker" type="range" min="0" max="2" step="0.05" value="1">
   <div class="vals" id="vBunker">1.00</div>
@@ -134,7 +134,7 @@ const colliders=[], scaleRefs=[], walkables=[];
 let feet=0, interiorBox=null;
 let rooms=[]; // {name, outline:[[x,z]...], door?, floorY?, area}
 let currentRoomName='';
-let brightGeneral = +localStorage.getItem('arkBright') || 1;
+let brightGeneral = +localStorage.getItem('arkBright2') || 1.35;
 let bunkerBright = localStorage.getItem('arkBunker');
 bunkerBright = bunkerBright===null ? 1 : +bunkerBright;
 brightGeneral = Math.min(2, Math.max(0.3, brightGeneral));
@@ -364,7 +364,7 @@ function syncSliders(){
 document.getElementById('gear').onclick=e=>{ e.stopPropagation(); openSettings(!settingsOpen); };
 document.getElementById('setClose').onclick=e=>{ e.stopPropagation(); openSettings(false); };
 document.getElementById('slBright').oninput=e=>{
-  brightGeneral=+e.target.value; localStorage.setItem('arkBright', String(brightGeneral));
+  brightGeneral=+e.target.value; localStorage.setItem('arkBright2', String(brightGeneral));
   renderer.toneMappingExposure=brightGeneral; document.getElementById('vBright').textContent=brightGeneral.toFixed(2);
 };
 document.getElementById('slBunker').oninput=e=>{
