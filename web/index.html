@@ -39,7 +39,8 @@ const touch = matchMedia('(pointer: coarse)').matches;
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
-renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.5;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -49,7 +50,7 @@ const sky = SKY?.sky ?? {zenith:'#6d96c0',upper:'#7aa6cc',horizon:'#84aecf',clou
 const fog = SKY?.fog ?? {color:'#9db8cf',near_m:60,far_m:400};
 scene.background = C(sky.horizon);
 scene.fog = new THREE.Fog(C(fog.color), fog.near_m, fog.far_m);
-const hemi=new THREE.HemisphereLight(C(sky.upper), C(SKY?.ground?.grass_shade ?? '#4c6328'), 1.8); scene.add(hemi);
+const hemi=new THREE.HemisphereLight(C(sky.upper), C(SKY?.ground?.grass_shade ?? '#4c6328'), 0.6); scene.add(hemi);
 let sun=null; const lamps=[];
 // gradient sky dome with soft procedural clouds, colours from data/sky.json
 scene.add(new THREE.Mesh(new THREE.SphereGeometry(450,32,16), new THREE.ShaderMaterial({
@@ -77,8 +78,9 @@ const qp=new URLSearchParams(location.search).get('pos');
 const colliders=[], scaleRefs=[];
 new GLTFLoader().load(MODEL, g=>{
   g.scene.traverse(o=>{
-    if(o.isLight){ o.intensity = o.isDirectionalLight ? Math.min(o.intensity,3) : Math.min(o.intensity,8)*0.4; if(o.isDirectionalLight) sun=o; else lamps.push(o); o.userData.base=o.intensity; }
+    if(o.isLight){ o.intensity = o.isDirectionalLight ? Math.min(o.intensity,3) : Math.min(o.intensity,8); if(o.isDirectionalLight){ sun=o; o.castShadow=true; o.shadow.mapSize.set(2048,2048); const sc=o.shadow.camera; sc.left=sc.bottom=-30; sc.right=sc.top=30; sc.near=0.5; sc.far=200; o.shadow.bias=-0.0005; o.shadow.normalBias=0.03; } else lamps.push(o); o.userData.base=o.intensity; }
     if(o.isMesh){
+      o.castShadow=true; o.receiveShadow=true;
       if(SKY?.ground && o.material?.name==='Grass_Mound') o.material.color.set(SKY.ground.grass_sunlit);
       if(o.name.startsWith('ScaleRef_')){ o.visible=false; scaleRefs.push(o); return; }
       if(!/Floor|Ground_Soil|Apron|Threshold|Bulb|Sign_/.test(o.name)) colliders.push(o);
@@ -184,9 +186,8 @@ renderer.setAnimationLoop(()=>{
   camera.position.y=EYE;
   // no shadows yet, so daylight would shine through the earth cover: fade it out once past the blast door
   const inside = THREE.MathUtils.clamp((0.6 - camera.position.z)/1.5, 0, 1);
-  hemi.intensity = THREE.MathUtils.lerp(1.8, 0.12, inside);
+  hemi.intensity = THREE.MathUtils.lerp(0.6, 0.1, inside);
   if(sun) sun.intensity = sun.userData.base*(1-inside);
-  renderer.toneMappingExposure = THREE.MathUtils.lerp(1.5, 1.0, inside);
   posEl.textContent=`x ${camera.position.x.toFixed(1)}  z ${camera.position.z.toFixed(1)}`;
   renderer.render(scene,camera);
 });
