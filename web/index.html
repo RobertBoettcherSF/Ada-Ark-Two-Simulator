@@ -27,6 +27,15 @@
   #settings .close{margin-top:12px;padding:6px 12px;border:0;border-radius:6px;background:#444;color:#fff;cursor:pointer;width:100%}
   #bigMap{position:fixed;inset:0;z-index:30;display:none;background:rgba(0,0,0,.88);align-items:center;justify-content:center;flex-direction:column;gap:8px;cursor:pointer}
   #bigMap.show{display:flex}
+  #roomList{position:fixed;right:10px;top:250px;z-index:7;width:min(250px,40vw);max-height:calc(100vh - 270px);display:flex;flex-direction:column;background:rgba(0,0,0,.7);border-radius:8px;font-size:12px}
+  #roomList .hd{padding:6px 8px;font-weight:700;color:#f6c64a;cursor:pointer;user-select:none}
+  #roomList .bd{overflow-y:auto;padding:0 4px 6px}
+  #roomList.collapsed .bd{display:none}
+  #roomList .r{display:flex;gap:6px;align-items:center;padding:3px 4px;border-radius:4px}
+  #roomList .r.here{background:rgba(246,198,74,.25)}
+  #roomList .st{width:22px;flex:none;text-align:center;cursor:pointer;font-size:14px}
+  #roomList .nm{flex:1;cursor:pointer}
+  #roomList .nm:hover{text-decoration:underline}
   #bigMap canvas{max-width:min(920px,94vw);max-height:min(820px,82vh);width:auto;height:auto;background:rgba(20,24,28,.95);border:1px solid rgba(255,255,255,.25);border-radius:10px}
   #bigMap .title{font-size:18px;font-weight:700;color:#f6c64a}
   #bigMap .hint{font-size:12px;opacity:.7}
@@ -38,7 +47,7 @@
 </head>
 <body>
 <div id="hud"><b>Ark Two</b> · <span id="bname">walk-through</span><br>
-<span id="help">W A S D move · mouse look · Shift run · R scale refs · M map · F9 debug · Esc release</span><br>
+<span id="help">W A S D move · mouse look · Shift run · R scale refs · M map · L room list · F9 debug · Esc release</span><br>
 <span id="pos"></span><br><span id="fps"></span></div>
 <button id="gear" title="Settings" aria-label="Settings">⚙</button>
 <div id="settings">
@@ -63,6 +72,7 @@
   <canvas id="bigMapCv" width="900" height="700"></canvas>
   <div class="hint">M or Esc to close · tap to close</div>
 </div>
+<div id="roomList"><div class="hd" id="rlHd">Rooms</div><div class="bd" id="rlBd"></div></div>
 <div id="start">Loading model…</div>
 <div id="stick"><div id="knob"></div></div>
 <button id="dbg">Debug</button>
@@ -199,7 +209,7 @@ async function tryPlanJson(){
       const pts=outline.map(p=>Array.isArray(p)?[+p[0],+p[1]]:[+p.x,+p.z]);
       if(pts.some(p=>p.some(n=>!isFinite(n)))) continue;
       const door=raw.door? (Array.isArray(raw.door)?[+raw.door[0],+raw.door[1]]:[+raw.door.x,+raw.door.z]) : null;
-      out.push({name, outline:pts, door, floorY: raw.floorY ?? raw.y ?? null, area:polyArea(pts)});
+      out.push({name, outline:pts, door, floorY: raw.floorY ?? raw.floor_y ?? raw.y ?? null, area:polyArea(pts)});
     }
     return out.length?out:null;
   }catch(e){ return null; }
@@ -324,10 +334,11 @@ const onModel = g=>{
   rebuildNear(true); updatePool();
   // rooms: prefer plan.json, else derive from floors
   tryPlanJson().then(plan=>{
-    rooms = plan || roomsFromModel(g.scene);
+    rooms = plan || roomsFromModel(g.scene); buildRoomList();
   });
   // also set immediately from model so first frames work; plan replaces if found
   if(!rooms.length) rooms = roomsFromModel(g.scene);
+  buildRoomList();
   const s=document.getElementById('start');
   s.textContent = touch ? 'Tap to start' : 'Click to start walking';
   if(qs.get('map')==='1') openBigMap(true);
@@ -397,6 +408,7 @@ addEventListener('keydown',e=>{
     if(bigMapOpen){ e.preventDefault(); openBigMap(false); return; }
     if(settingsOpen){ e.preventDefault(); openSettings(false); return; }
   }
+  if(e.code==='KeyL' && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); toggleRoomList(); return; }
   if(e.code==='KeyM' && !e.ctrlKey && !e.metaKey && !e.altKey){
     e.preventDefault(); openBigMap(!bigMapOpen); return;
   }
@@ -466,7 +478,7 @@ function snapshot(){
     looking_at:hit?{object:hit.object.name,distance_m:+hit.distance.toFixed(2)}:null,
     room:currentRoomName||null,
     brightness:{general:brightGeneral, bunker:bunkerBright}, resolution:resScale,
-    fps:fpsNow, drawCalls:lastCalls,
+    fps:fpsNow, drawCalls:lastCalls, rooms_status:roomStatus,
     note:prompt('Debug note (optional):')||''};
   const stamp=data.time.replace(/[:.]/g,'-');
   dl(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),`ark_debug_${stamp}.json`);
@@ -475,6 +487,48 @@ function snapshot(){
   toast('Debug snapshot saved to Downloads');
 }
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+// --- dev room list: jump to a room, mark status (open / in progress / done)
+const ST=['open','in progress','done'], STI={'open':'☐','in progress':'◐','done':'✅'};
+let roomStatus={}; try{ roomStatus=JSON.parse(localStorage.getItem('arkRoomStatus')||'{}'); }catch(e){}
+fetch('rooms_status.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{ if(j){ for(const k in j) if(!(k in roomStatus)) roomStatus[k]=j[k]; buildRoomList(); } }).catch(()=>{});
+const rlEl=document.getElementById('roomList');
+if(touch || localStorage.getItem('arkRoomListCollapsed')==='1') rlEl.classList.add('collapsed');
+function toggleRoomList(){ rlEl.classList.toggle('collapsed'); localStorage.setItem('arkRoomListCollapsed', rlEl.classList.contains('collapsed')?'1':'0');
+  if(!rlEl.classList.contains('collapsed')) releaseLock(); }
+document.getElementById('rlHd').onclick=e=>{ e.stopPropagation(); toggleRoomList(); };
+rlEl.addEventListener('pointerdown',e=>e.stopPropagation()); rlEl.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+function roomPoint(r){ // a point inside the polygon, near its centre
+  const o=r.outline; let cx=0,cz=0; for(const p of o){cx+=p[0];cz+=p[1];} cx/=o.length; cz/=o.length;
+  if(pointInPoly(cx,cz,o)) return [cx,cz];
+  let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9; for(const p of o){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);z0=Math.min(z0,p[1]);z1=Math.max(z1,p[1]);}
+  let best=null,bd=1e18; for(let i=1;i<20;i++)for(let k=1;k<20;k++){ const x=x0+(x1-x0)*i/20, z=z0+(z1-z0)*k/20;
+    if(pointInPoly(x,z,o)){ const d=(x-cx)**2+(z-cz)**2; if(d<bd){bd=d;best=[x,z];} } }
+  return best||[o[0][0],o[0][1]];
+}
+function jumpToRoom(r){
+  const [x,z]=roomPoint(r); camera.position.x=x; camera.position.z=z;
+  const top=(r.floorY!=null?r.floorY:feet)+1.6;
+  const rc=new THREE.Raycaster(new THREE.Vector3(x,top,z),new THREE.Vector3(0,-1,0));
+  const hs=rc.intersectObjects(walkables,false); if(hs.length) feet=hs[0].point.y; else if(r.floorY!=null) feet=r.floorY;
+  rebuildNear(true); updatePool(); toast(r.name);
+}
+function buildRoomList(){
+  const bd=document.getElementById('rlBd'); if(!bd) return; bd.innerHTML='';
+  const list=rooms.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  let done=0; for(const r of list) if(roomStatus[r.name]==='done') done++;
+  document.getElementById('rlHd').textContent='Rooms '+done+'/'+list.length+' done  (L)';
+  for(const r of list){
+    const row=document.createElement('div'); row.className='r'+(r.name===currentRoomName?' here':''); row.dataset.n=r.name;
+    const st=document.createElement('span'); st.className='st'; const cur=roomStatus[r.name]||'open'; st.textContent=STI[cur]; st.title=cur+' (tap to change)';
+    st.onclick=e=>{ e.stopPropagation(); const n=ST[(ST.indexOf(roomStatus[r.name]||'open')+1)%3]; roomStatus[r.name]=n;
+      localStorage.setItem('arkRoomStatus',JSON.stringify(roomStatus)); buildRoomList(); };
+    const nm=document.createElement('span'); nm.className='nm'; nm.textContent=r.name; nm.title='Jump here';
+    nm.onclick=e=>{ e.stopPropagation(); jumpToRoom(r); };
+    row.append(st,nm); bd.append(row);
+  }
+}
+let rlHere='';
+setInterval(()=>{ if(rlHere!==currentRoomName){ rlHere=currentRoomName; for(const el of document.querySelectorAll('#rlBd .r')) el.classList.toggle('here', el.dataset.n===rlHere); } },300);
 function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>el.style.display='none',2500);}
 
 // --- minimap drawing
